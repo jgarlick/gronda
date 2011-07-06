@@ -30,8 +30,17 @@ void wc_menu_handler (char *text, int index)
 void cmd_wc (int argc, char *argv[])
 {
 	menu_t *m;
+	int force_quit = 0;
+	
+	if (argc > 1) {
+		if (!strcmp(argv[1], "-y")) { /* force quit without saving */
+			force_quit = 1;
+		} else if (!strcmp(argv[1], "-f")) { /* save and quit */
+			cmd_pw(0, 0);
+		}
+	}
 
-	if (e->cpad->flags & MODIFIED)
+	if ((e->cpad->flags & MODIFIED) && !force_quit)
 	{
 		/* TODO: use a pre-allocated menu */
 		m = menu_alloc ("File modified; okay to quit?");
