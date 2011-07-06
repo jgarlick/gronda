@@ -105,7 +105,6 @@ resize ()
 int
 main (int argc, char **argv)
 {
-	int     key, mods;
 	struct itimerval value;
 	char   *s;
 	char   *home;

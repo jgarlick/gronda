@@ -99,7 +99,7 @@ void sig_cleanexit (char *str, ...)
 	vasprintf (&out, str, argp);
 	va_end (argp);
 
-	printf (out);
+	printf ("%s", out);
 
 	free (out);
 
@@ -118,7 +118,7 @@ void sig_die (char *str, ...)
 	vasprintf (&out, str, argp);
 	va_end (argp);
 
-	printf (out);
+	printf ("%s", out);
 
 	free (out);
 

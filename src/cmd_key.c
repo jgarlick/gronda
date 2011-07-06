@@ -19,8 +19,6 @@
 
 void cmd_kd (int argc, char *argv[])
 {
-	int     r;
-
 	if (strcmp (argv[argc - 1], "ke"))
 	{
 		output_message_c (argv[0], "Missing ke");

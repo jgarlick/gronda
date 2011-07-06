@@ -13,6 +13,7 @@
  *  purpose : Window and pane movement commands
  *  authors : James Garlick
  */
+#include <string.h>
 
 #include "editor.h"
 

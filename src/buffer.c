@@ -149,7 +149,6 @@ void buffer_cutcopy (buffer_t *buf, int cut, int shape, int start_y, int start_x
 	pad_t  *p = e->cpad;
 	int     len, copied_len;
 	int     start;
-	int     end;
 	int     intab;
 
 	l = LINE_get_line_at (p, start_y);
