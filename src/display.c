@@ -143,109 +143,122 @@ void display_beep ()
 	beep ();
 };
 
-void display_nextevent (int *key, int *mods)
+void display_nextevent ()
 {
-	*key = getch ();
+	int keycode;
+	int shift;
+	int ctrl;
+	
+	shift = 0;
+	ctrl  = 0;
 
-	switch (*key)
+	keycode = getch ();
+
+	debug("KEYCODE %d", keycode);
+
+	/* shift + function keys */
+	if (keycode >= 277 && keycode <= 284) {
+		shift = 1;
+		keycode -= 12;
+	}
+
+	/* ctrl + letter */
+	if (keycode < 26 && keycode != 8 && keycode != 9 && keycode != 13) {
+		ctrl = 1;
+		keycode += 96;
+	}
+
+	switch (keycode)
 	{
 	case KEY_RESIZE:
 		resize_handler ();
-		*key = 0;
+		e->key[0] = 0;
 		break;
 	case KEY_UP:
-		*key = K_UP;
+		strcpy(e->key, "up");
 		break;
 	case KEY_DOWN:
-		*key = K_DOWN;
+		strcpy(e->key, "down");
 		break;
 	case KEY_LEFT:
-		*key = K_LEFT;
+		strcpy(e->key, "left");
 		break;
 	case KEY_RIGHT:
-		*key = K_RIGHT;
+		strcpy(e->key, "right");
 		break;
 
 	case KEY_IC:
-		*key = K_INS;
+		strcpy(e->key, "ins");
 		break;
 	case KEY_DC:
-		*key = K_DEL;
+		strcpy(e->key, "del");
 		break;
 	case KEY_BACKSPACE:
-		*key = K_BS;
+		strcpy(e->key, "bs");
 		break;
 	case KEY_HOME:
-		*key = K_HOME;
+		strcpy(e->key, "home");
 		break;
 	case KEY_END:
-		*key = K_END;
+		strcpy(e->key, "end");
 		break;
 	case KEY_PPAGE:
-		*key = K_PGUP;
+		strcpy(e->key, "pgup");
 		break;
 	case KEY_NPAGE:
-		*key = K_PGDOWN;
+		strcpy(e->key, "pgdown");
 		break;
 	case KEY_F (1):
-		*key = K_F1;
+		strcpy(e->key, "f1");
 		break;
 	case KEY_F (2):
-		*key = K_F2;
+		strcpy(e->key, "f2");
 		break;
 	case KEY_F (3):
-		*key = K_F3;
+		strcpy(e->key, "f3");
 		break;
 	case KEY_F (4):
-		*key = K_F4;
+		strcpy(e->key, "f4");
 		break;
 	case KEY_F (5):
-		*key = K_F5;
+		strcpy(e->key, "f5");
 		break;
 	case KEY_F (6):
-		*key = K_F6;
+		strcpy(e->key, "f6");
 		break;
 	case KEY_F (7):
-		*key = K_F7;
+		strcpy(e->key, "f7");
 		break;
 	case KEY_F (8):
-		*key = K_F8;
+		strcpy(e->key, "f8");
 		break;
-	case KEY_F (9):
-		*key = K_F9;
-		break;
-	case KEY_F (10):
-		*key = K_F10;
-		break;
-	case KEY_F (11):
-		*key = K_F11;
-		break;
-	case KEY_F (12):
-		*key = K_F12;
-		break;
-
 	case '\'':
-		*key = K_SQUOTE;
+		strcpy(e->key, "squote");
 		break;
 	case '\"':
-		*key = K_DQUOTE;
+		strcpy(e->key, "dquote");
 		break;
 
 		/* TODO - make these terminal independant */
 	case 27:
-		*key = K_ESC;
+		strcpy(e->key, "esc");
 		break;
 	case 13:
-		*key = K_ENTER;
+		strcpy(e->key, "enter");
 		break;
 	case 9:
-		*key = K_TAB;
+		strcpy(e->key, "tab");
 		break;
 	case 8:
 	case 127:
-		*key = K_BS;
+		strcpy(e->key, "bs");
 		break;
+	default:
+		sprintf(e->key, "%c", keycode);	
 	}
+	
+	if (shift) sprintf(e->key, "%sS", e->key);
+	if (ctrl)  sprintf(e->key, "^%s", e->key);
 }
 
 void display_redraw_title ()
@@ -503,7 +516,6 @@ void display_do_menu (menu_t * menu)
 	menu_item_t *mi;
 	int     width, len, index, done;
 	int     a;
-	int     key, mods;
 	int     x, y;
 	char   *s, *t;
 	int     selected, old_selected;
@@ -626,24 +638,18 @@ void display_do_menu (menu_t * menu)
 	done = 0;
 	while (done == 0)
 	{
-		display_nextevent (&key, &mods);
+		display_nextevent ();
 
-		switch (key)
-		{
-		case K_ESC:
-			done = -1;
-			break;
-		case K_UP:
+		if (!strcmp(e->key, "esc")) {
+			done = 1;
+		} else if (!strcmp(e->key, "up")) {
 			if (selected > 1)
 				selected--;
-			break;
-		case K_DOWN:
+		} else if (!strcmp(e->key, "down")) {
 			if (selected < item_count)
 				selected++;
-			break;
-		case K_ENTER:
+		} else if (!strcmp(e->key, "enter")) {
 			done = selected;
-			break;
 		}
 
 		/* change selection */
@@ -678,7 +684,7 @@ void display_do_menu (menu_t * menu)
 		while (mi)
 		{
 			index++;
-			if ((char) key == mi->quick_key || index == done)
+			if ((char) *(e->key) == mi->quick_key || index == done)
 			{
 				(mi->handler) (mi->text, index);
 				done = 1;

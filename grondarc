@@ -11,12 +11,19 @@ kd pgup 'pv -10' ke
 kd home tl ke
 kd end tr ke
 
-kd f1 'dr;echo' ke
-kd f2 xc ke
-kd f3 xd ke
-kd f4 xp ke
-kd f5 'xd line_del' ke
-kd f8 wc ke
+kd F1    'dr;echo' ke
+kd F1S   'dr;echo -r' ke 
+kd F2    xc ke
+kd F2S   'xc -r' ke
+kd F3    xd ke
+kd F3S   'xd -r' ke
+kd F4    xp ke
+kd F4S   'xp -r' ke
+kd F5 'xd line_del' ke
+kd F8 wc ke
+
+kd ^q wc ke
+
 
 kd right 'ar' ke
 kd left  'al' ke

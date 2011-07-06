@@ -15,76 +15,12 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <string.h>
 
 #include "editor.h"
 
-keydef_t *root;
-
-char   *special_keynames[] =
-	{ "up", "down", "left", "right", "f1", "f2", "f3", "f4", "f5", "f6", "f7",
-"f8", "f9", "f10", "f11", "f12", "ins", "del", "bs", "home", "end", "pgup", "pgdown", "esc",
-"enter", "tab", "squote", "dquote", 0 };
-
-void
-insert (keydef_t * root, int code, char *def)
-{
-	keydef_t **mover;
-	int     r, exists = 0;
-	int     nleft;
-
-	nleft = code << ((sizeof (int) * 8) - 5);
-	code = code >> 5;
-	code = code | nleft;
-
-	mover = &root;
-
-	if (root->code == 0)
-	{
-		exists = 1;
-	}
-
-	while (*mover && exists == 0)
-	{
-		r = code - (*mover)->code;
-
-		if (r > 0)
-		{
-			mover = &(*mover)->r;
-		}
-		else if (r < 0)
-		{
-			mover = &(*mover)->l;
-		}
-		else
-		{
-			exists = 1;
-		}
-	}
-
-	if (!exists)
-	{
-		if ((*mover = ALLOC (keydef_t)) == NULL)
-		{
-			debug ("malloc error");
-			exit (1);
-		}
-	}
-	else if ((*mover)->def)
-		FREE ((*mover)->def);
-
-	(*mover)->def = (char *) calloc (1, strlen (def) + 2);
-	if ((*mover)->def == NULL)
-	{
-		debug ("malloc error");
-		exit (1);
-	}
-
-	strcpy ((*mover)->def, def);
-
-	(*mover)->code = code;
-	(*mover)->l = (*mover)->r = NULL;
-}
+keydef_t *keydef_ptrs[27] = { NULL };
 
 void
 KEY_init ()
@@ -92,16 +28,6 @@ KEY_init ()
 	char    k[10];
 	char    es[80];
 	int     a;
-
-	if ((root = ALLOC (keydef_t)) == NULL)
-	{
-		debug ("malloc error\n");
-		exit (1);
-	}
-
-	root->code = 0;
-	root->l = root->r = NULL;
-	root->def = NULL;
 
 	/* default key bindings */
 
@@ -131,75 +57,60 @@ KEY_init ()
 
 }
 
+int 
+get_keydef_index (char *a)
+{
+	while (*a && !isalpha(*a))
+		a++;
+	
+	return isalpha (*a) ? tolower (*a) - 'a' : 26;
+}
+
 void
-KEY_debug (keydef_t * node)
+KEY_define (char *key_name, char *def)
 {
-	if (!node)
+	keydef_t *new;
+	int     a;
+
+	new = KEY_find (key_name);
+
+	if (new)
+	{
+		debug ("Keydef overridden: %s\n", key_name);
+		free(new->def);
+		new->def = strdup(def);
+
 		return;
-
-	KEY_debug (node->l);
-
-	debug ("Node value : %d %s\n", node->code, node->def);
-
-	KEY_debug (node->r);
-}
-
-int
-KEY_define (char *key, char *def)
-{
-	int     key_code, a, done;
-
-	if (strlen (key) > 1)
-	{
-		a = done = 0;
-
-		while (special_keynames[a] && !done)
-		{
-			if (!strcasecmp (key, special_keynames[a]))
-			{
-				insert (root, 500 + a, def);
-				done = 1;
-			}
-			a++;
-
-		}
-		if (!done)
-		{
-/*                        set_error( G_ERROR_NO_SUCH_KEY );*/
-			debug ("Unknown key %s", key);
-			return -1;
-		}
-
-	}
-	else
-	{
-		key_code = (int) *key;
-		insert (root, key_code, def);
 	}
 
-	return 0;
+	new = ALLOC (keydef_t);
+	new->name = strdup (key_name);
+	new->def = strdup(def);
+
+	a = get_keydef_index (key_name);
+
+	new->next = keydef_ptrs[a];
+	keydef_ptrs[a] = new;
+
+	debug ("Keydef added: %s\n", key_name);
 }
 
-char   *
-KEY_find (int code)
+keydef_t   *
+KEY_find (char *key_name)
 {
 	keydef_t *mover;
-	int     r, nleft;
+	int     a;
 
-	nleft = code << ((sizeof (int) * 8) - 5);
-	code = code >> 5;
-	code = code | nleft;
+	a = get_keydef_index (key_name);
 
-	for (mover = root; mover != NULL;)
+	mover = keydef_ptrs[a];
+
+	while (mover)
 	{
-		r = code - ((mover->code));
+		if (!strcasecmp (key_name, mover->name))
+			return mover;
 
-		if (r < 0)
-			mover = mover->l;
-		else if (r > 0)
-			mover = mover->r;
-		else
-			return mover->def;
+		mover = mover->next;
 	}
 
 	return NULL;

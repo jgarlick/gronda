@@ -149,6 +149,7 @@ typedef struct editor_s
 
 	int    *dm;					/* display modifiers */
 
+	char    key[80];         /* used to store the current keydef executed */
 }
 editor_t;
 
@@ -271,7 +272,7 @@ void cmd_wc   (int argc, char *argv[]);
 /* required display functions */
 void    display_init (void);
 void    display_fini (void);
-void    display_nextevent (int *, int *);
+void    display_nextevent ();
 void    display_max_pad_dim (int *, int *);
 void    display_redraw_title (void);
 void    display_redraw_stats (void);

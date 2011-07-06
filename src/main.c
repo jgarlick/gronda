@@ -113,6 +113,7 @@ main (int argc, char **argv)
 	int     lines;
 	int     a;
 	char   *args[2];
+	keydef_t *keydef;
 
 	sig_init ();
 
@@ -196,25 +197,19 @@ main (int argc, char **argv)
 	/* main loop */
 	while (1)
 	{
-		key = mods = 0;
-
 		/* blocks until event or timer tick */
-		display_nextevent (&key, &mods);
+		display_nextevent ();
 
-		if (key > 0 && key != 410)
+		if (e->key[0] != 0) /* && key != 410)*/
 		{
-			if (key < 500)
-				debug ("KEY %d (%c) MODS %d", key, (char) key, mods);
+			debug ("KEY %s", e->key);
 
 			if (e->occupied_window == COMMAND_WINDOW)
 			{
-				switch (key)
-				{
-				case K_ESC:
+				if (!strcmp(e->key, "esc")) {
 					e->occupied_window = EDIT_WINDOW;
 					redraw ();
-					break;
-				case K_ENTER:
+				} else if (!strcmp(e->key, "enter")) {
 					if (*(e->input->buffer))
 					{
 						debug ("To Parser: %s", e->input->buffer);
@@ -231,10 +226,7 @@ main (int argc, char **argv)
 						e->occupied_window = EDIT_WINDOW;
 						redraw ();
 					}
-
-					break;
-					/* backspace */
-				case K_BS:
+				} else if (!strcmp(e->key, "bs")) { /* backspace */
 					if (e->input->curs_x)
 					{
 						e->input->curs_x--;
@@ -243,54 +235,40 @@ main (int argc, char **argv)
 						e->redraw |= COMMAND;
 						redraw ();
 					}
-					break;
-				case K_SQUOTE:
+				} else if (!strcmp(e->key, "squote")) {
 					e->input->buffer[e->input->curs_x + e->input->offset] =
 						'\'';
 					e->input->curs_x++;
 					e->redraw |= COMMAND;
 					redraw ();
-					break;
-				case K_DQUOTE:
+				} else if (!strcmp(e->key, "dquote")) {
 					e->input->buffer[e->input->curs_x + e->input->offset] =
 						'\"';
 					e->input->curs_x++;
 					e->redraw |= COMMAND;
 					redraw ();
-					break;
-				default:
-					if (key >= 32 && key <= 126)
-					{
-						e->input->buffer[e->input->curs_x + e->input->offset] =
-							(char) key;
-						e->input->curs_x++;
-						e->redraw |= COMMAND;
-						redraw ();
-					}
+				} else if (strlen(e->key) == 1 && *e->key >= 32 && *e->key <= 126) {
+					e->input->buffer[e->input->curs_x + e->input->offset] =
+						(char) *e->key;
+					e->input->curs_x++;
+					e->redraw |= COMMAND;
+					redraw ();
 				}
 			}
 			else if (e->occupied_window == EDIT_WINDOW)
 			{
-				s = KEY_find (key);
+				keydef = KEY_find (e->key);
 
-				if (s)
+				if (keydef)
 				{
-					debug ("Found keydef for %d : '%s'", key, s);
-					parse ("%s", s);
+					debug ("Found keydef for %s : '%s'", e->key, keydef->def);
+					parse ("%s", keydef->def);
 
 					redraw ();
 				}
 				else
-					debug ("No keydef defined for (%d)\n", key);
+					debug ("No keydef defined for (%s)\n", e->key);
 			}
-
-			if (key == -1)
-				debug ("An unknown key was pressed");
-			else if (key > 0 && key < 32)
-				debug ("Key press ( %d )", key);
-			else if (key > 500)
-				debug ("%s was pressed", special_keynames[key - 500]);
-
 		}
 	}
 

@@ -30,10 +30,7 @@ void cmd_kd (int argc, char *argv[])
 
 	/* TODO - concatenate remaining args up to ke */
 
-	r = KEY_define (argv[1], argv[2]);
-
-	if (r < 0)
-		output_message_c (argv[0], "Unknown key \'%s\'", argv[1]);
+	KEY_define (argv[1], argv[2]);
 }
 
 
