@@ -107,7 +107,7 @@ KEY_find (char *key_name)
 
 	while (mover)
 	{
-		if (!strcasecmp (key_name, mover->name))
+		if (!strcmp (key_name, mover->name))
 			return mover;
 
 		mover = mover->next;
