@@ -210,28 +210,28 @@ void display_nextevent ()
 		strcpy(e->key, "pgdown");
 		break;
 	case KEY_F (1):
-		strcpy(e->key, "f1");
+		strcpy(e->key, "F1");
 		break;
 	case KEY_F (2):
-		strcpy(e->key, "f2");
+		strcpy(e->key, "F2");
 		break;
 	case KEY_F (3):
-		strcpy(e->key, "f3");
+		strcpy(e->key, "F3");
 		break;
 	case KEY_F (4):
-		strcpy(e->key, "f4");
+		strcpy(e->key, "F4");
 		break;
 	case KEY_F (5):
-		strcpy(e->key, "f5");
+		strcpy(e->key, "F5");
 		break;
 	case KEY_F (6):
-		strcpy(e->key, "f6");
+		strcpy(e->key, "F6");
 		break;
 	case KEY_F (7):
-		strcpy(e->key, "f7");
+		strcpy(e->key, "F7");
 		break;
 	case KEY_F (8):
-		strcpy(e->key, "f8");
+		strcpy(e->key, "F8");
 		break;
 	case '\'':
 		strcpy(e->key, "squote");
