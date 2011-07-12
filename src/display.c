@@ -148,6 +148,7 @@ void display_nextevent ()
 	int keycode;
 	int shift;
 	int ctrl;
+	char buffer[80];
 	
 	shift = 0;
 	ctrl  = 0;
@@ -257,8 +258,14 @@ void display_nextevent ()
 		sprintf(e->key, "%c", keycode);	
 	}
 	
-	if (shift) sprintf(e->key, "%sS", e->key);
-	if (ctrl)  sprintf(e->key, "^%s", e->key);
+	if (shift) {
+		strcpy(buffer, e->key);
+		sprintf(e->key, "%sS", buffer);
+	}
+	if (ctrl) {
+		strcpy(buffer, e->key);
+		sprintf(e->key, "^%s", buffer);
+	}
 }
 
 void display_redraw_title ()
