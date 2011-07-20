@@ -32,6 +32,7 @@ OBJS = src/buffer.o \
 	src/cmd_window.o \
 	src/command.o \
 	src/display.o \
+	src/editor.o \
 	src/keydefs.o \
 	src/lex.o \
 	src/line.o \
