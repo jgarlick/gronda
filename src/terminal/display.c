@@ -21,7 +21,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "editor.h"
+#include "../include/editor.h"
 
 struct ttysize dimensions;
 int lineno;

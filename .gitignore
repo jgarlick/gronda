@@ -1,2 +1,4 @@
 *.o
 gronda
+gronda-terminal
+gronda-terminal.dSYM

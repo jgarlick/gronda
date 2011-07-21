@@ -17,7 +17,7 @@
 #include <sys/time.h>
 #include <string.h>
 
-#include "editor.h"
+#include "../include/editor.h"
 
 void
 resize ()
