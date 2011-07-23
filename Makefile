@@ -9,10 +9,21 @@ EDITOR_VERSION  = "0.3.9b"
 CC      = gcc
 CFLAGS  = -ggdb3 -Wall -Isrc/include -DLINUX -DEDITOR_NAME='$(EDITOR_NAME)' -DEDITOR_VERSION='$(EDITOR_VERSION)' -DYY_NO_UNPUT
 
-all : gronda-terminal
+libcfiles := $(wildcard src/*.c)
+libobjects := $(notdir $(patsubst %.c,%.o,$(libcfiles)))
 
-gronda-terminal : clean
-	$(CC) $(CFLAGS) src/*.c src/terminal/*.c -lncurses -o $(BINARY_NAME)-terminal
-                
-clean :            
-	@( rm -f $(BINARY_NAME)-terminal )
+all: gronda-terminal
+
+libgronda : $(libcfiles)
+	$(CC) $(CFLAGS) $(libcfiles) -c
+	ld -r -o libgronda.o $(libobjects)
+
+gronda: libgronda
+	`fltk-config --cxx` src/gui/main.cxx `fltk-config --cxxflags` `fltk-config --ldflags` libgronda.o -o gronda
+
+gronda-terminal: libgronda
+	$(CC) $(CFLAGS) src/terminal/*.c libgronda.o -lncurses -o $(BINARY_NAME)-terminal
+
+clean:
+	@( rm *.o )
+	@( rm $(BINARY_NAME)-terminal )
