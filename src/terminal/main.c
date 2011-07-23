@@ -18,6 +18,7 @@
 #include <string.h>
 
 #include "../include/editor.h"
+#include "include/display.h"
 
 void
 resize ()

@@ -16,7 +16,6 @@
 #include "menu.h"
 #include "recovery.h"
 #include "command.h"
-#include "display.h"
 
 #define BUFFER_SIZE 1024
 
