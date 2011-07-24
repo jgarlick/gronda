@@ -55,89 +55,11 @@ int
 main (int argc, char **argv)
 {
 	struct itimerval value;
-	char   *s;
-	char   *home;
-	char    tmp[256];
-	int     lines;
-	int     a;
-	char   *args[2];
 	keydef_t *keydef;
 
-	sig_init ();
-
-	editor_init ();
-
-	create_local_config ();
-
+	editor_setup(argc, argv);
 	display_init ();
-
-	add_base_commands ();
-
-	/* handle command line args before plugin load */
-	for (a = 1; a < argc; a++)
-	{
-		s = argv[a];
-
-		if (*s == '-')
-		{
-			s++;
-			if (*s == 'd' || !strcasecmp (s, "-debug"))
-				e->flags |= DEBUG;
-		}
-	}
-
-	/* read a config file */
-	home = getenv ("HOME");
-
-	if (home != NULL)
-	{
-		sprintf (tmp, "%s/.gronda/startup", home);
-
-		lines = parse_commandfile (tmp);
-	}
-
-	if (lines == -1)
-	{
-		lines = parse_commandfile ("grondarc");
-
-		if (lines == -1)
-			sig_cleanexit
-				("Can't load configuration file grondarc\nThis is essential to the functioning of %s.\nAborting.\n",
-				 EDITOR_NAME);
-	}
-
-	output_message ("Config file: %d lines processed", lines);
-
-	/* handle command line args after plugin load */
-	for (a = 1; a < argc; a++)
-	{
-		s = argv[a];
-
-		if (*s == '-')
-		{
-			s++;
-			if (*s == 'v' || !strcasecmp (s, "-version"))
-			{
-				sig_cleanexit ("%s (v%s)\nhttp://gronda.sourceforge.net\n\n",
-							   EDITOR_NAME, EDITOR_VERSION);
-			}
-			else if (*s == 'h' || !strcasecmp (s, "-help"))
-			{
-				sig_cleanexit
-					("Usage: ge [--debug] [--version] [--help] [filename]\n");
-			}
-		}
-		else
-		{
-			args[0] = "ce";
-			args[1] = s;
-
-			cmd_ce (2, args);
-		}
-	}
-
-	e->redraw |= OUTPUT;
-	redraw ();
+	redraw();
 
 	/* start timer */
 	setitimer (ITIMER_REAL, &value, NULL);

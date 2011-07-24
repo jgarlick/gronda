@@ -174,6 +174,8 @@ extern editor_t *e;
 void    editor_init ();
 void    editor_fini ();
 
+void    editor_setup (int, char **);
+
 void    resize ();
 
 /* signals.c */
@@ -269,9 +271,10 @@ void cmd_tdm  (int argc, char *argv[]);
 void cmd_wc   (int argc, char *argv[]);
 
 /* required display functions */
-void    display_init (void);
+void    display_init (void);   // remove
+void    display_nextevent ();  // remove
+
 void    display_fini (void);
-void    display_nextevent ();
 void    display_max_pad_dim (int *, int *);
 void    display_redraw_title (void);
 void    display_redraw_stats (void);

@@ -237,8 +237,7 @@ int main(int argc, char **argv) {
 	int font_width;
 	int io_height;
 
-	editor_init ();
-
+	editor_setup(argc, argv);
 
 //	Fl::add_handler(handle);
 	MyWindow *window = new MyWindow(640,480);
