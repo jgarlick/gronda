@@ -168,15 +168,12 @@ extern line_t *LINE_get_line_at (pad_t *, int);
 extern int line_length (line_t *l);
 extern void line_grow_pad (pad_t *pad, int ypos);
 
-/* main.c */
+/* editor.c */
 extern editor_t *e;
 
 void    editor_init ();
 void    editor_fini ();
-
 void    editor_setup (int, char **);
-
-void    resize ();
 
 /* pad.c */
 pad_t *pad_new(void);
@@ -193,11 +190,6 @@ void    sig_handle_error (int);
 
 /* recovery.c */
 int crash_file_check (char *fname);
-
-/* redraw.c */
-void    dm_set (int row, int col, int mod);
-void    dm_clear_all ();
-void	redraw ();
 
 /* buffer.c */
 void get_region (int shape, int *start_y, int *start_x, int *end_y, int *end_x);
@@ -278,12 +270,6 @@ void cmd_wc   (int argc, char *argv[]);
 void    display_init (void);   // remove
 
 void    display_fini (void);
-void    display_redraw_title (void);
-void    display_redraw_stats (void);
-void    display_redraw_command (void);
-void    display_redraw_output (void);
-void    display_redraw_line (int, line_t *);
-void    display_redraw_curs (void);
 void    display_do_menu (menu_t *);
 void    display_finish_menu ();
 void    display_beep ();

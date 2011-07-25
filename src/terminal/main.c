@@ -21,7 +21,7 @@
 #include <string.h>
 
 #include "../include/editor.h"
-#include "include/display.h"
+#include "include/terminal.h"
 
 void get_viewport_size (int *width, int *height)
 {
