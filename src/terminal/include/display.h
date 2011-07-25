@@ -8,4 +8,6 @@
 #define ts_cols  ws_col
 #endif
 
+void next_event (void);
+
 #endif

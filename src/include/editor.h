@@ -272,7 +272,6 @@ void cmd_wc   (int argc, char *argv[]);
 
 /* required display functions */
 void    display_init (void);   // remove
-void    display_nextevent ();  // remove
 
 void    display_fini (void);
 void    display_max_pad_dim (int *, int *);

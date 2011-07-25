@@ -50,7 +50,6 @@ resize ()
 	redraw ();
 }
 
-
 int
 main (int argc, char **argv)
 {
@@ -68,7 +67,7 @@ main (int argc, char **argv)
 	while (1)
 	{
 		/* blocks until event or timer tick */
-		display_nextevent ();
+		next_event ();
 
 		if (e->key[0] != 0) /* && key != 410)*/
 		{

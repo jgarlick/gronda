@@ -42,109 +42,7 @@ void resize_handler ()
 	resize ();
 }
 
-void display_max_pad_dim (int *width, int *height)
-{
-	if (lineno)
-		*width = dimensions.ts_cols - 6;
-	else
-		*width = dimensions.ts_cols;
-
-	*height = dimensions.ts_lines - 2;
-}
-
-void cmd_delay (int argc, char *argv[])
-{
-	int     delay = atoi (argv[1]);
-
-	ESCDELAY = delay;
-
-	output_message_c (argv[0], "Esc delay changed to %d ms", delay);
-	debug ("Delay changed to %s milliseconds", argv[1]);
-}
-
-void cmd_lineno (int argc, char *argv[])
-{
-	if (argc > 1)
-	{
-		if (strcmp (argv[1], "-on") == 0)
-		{
-			lineno = 1;
-		}
-		else if (strcmp (argv[1], "-off") == 0)
-		{
-			lineno = 0;
-		}
-	}
-	else
-		lineno = !lineno;
-
-	resize ();
-}
-
-void cmd_showtabs (int argc, char *argv[])
-{
-	if (argc > 1)
-	{
-		if (strcmp (argv[1], "-on") == 0)
-		{
-			showtabs = 1;
-		}
-		else if (strcmp (argv[1], "-off") == 0)
-		{
-			showtabs = 0;
-		}
-	}
-	else
-		showtabs = !showtabs;
-
-	redraw ();
-}
-
-void display_init ()
-{
-	initscr ();
-	raw ();
-	noecho ();
-
-	nonl ();
-	intrflush (stdscr, FALSE);
-	keypad (stdscr, TRUE);
-
-	start_color ();
-	use_default_colors ();
-
-	lineno   = 1;
-	showtabs = 0;
-
-	resize_handler ();
-
-	if (getenv ("ESCDELAY") == NULL)
-		ESCDELAY = 50;
-
-	add_command ("delay",    cmd_delay);
-	add_command ("lineno",   cmd_lineno);
-	add_command ("showtabs", cmd_showtabs);
-
-	init_pair (1, COLOR_CYAN,    -1);
-	init_pair (2, COLOR_RED,     -1);
-	init_pair (3, COLOR_MAGENTA, -1);
-	init_pair (4, COLOR_GREEN,   -1);
-	init_pair (5, COLOR_WHITE, COLOR_GREEN);
-
-}
-
-void display_fini ()
-{
-	nocbreak ();
-	endwin ();
-}
-          
-void display_beep ()
-{
-	beep ();
-};
-
-void display_nextevent ()
+void next_event ()
 {
 	int keycode;
 	int shift;
@@ -268,6 +166,109 @@ void display_nextevent ()
 		sprintf(e->key, "^%s", buffer);
 	}
 }
+
+
+void display_max_pad_dim (int *width, int *height)
+{
+	if (lineno)
+		*width = dimensions.ts_cols - 6;
+	else
+		*width = dimensions.ts_cols;
+
+	*height = dimensions.ts_lines - 2;
+}
+
+void cmd_delay (int argc, char *argv[])
+{
+	int     delay = atoi (argv[1]);
+
+	ESCDELAY = delay;
+
+	output_message_c (argv[0], "Esc delay changed to %d ms", delay);
+	debug ("Delay changed to %s milliseconds", argv[1]);
+}
+
+void cmd_lineno (int argc, char *argv[])
+{
+	if (argc > 1)
+	{
+		if (strcmp (argv[1], "-on") == 0)
+		{
+			lineno = 1;
+		}
+		else if (strcmp (argv[1], "-off") == 0)
+		{
+			lineno = 0;
+		}
+	}
+	else
+		lineno = !lineno;
+
+	resize ();
+}
+
+void cmd_showtabs (int argc, char *argv[])
+{
+	if (argc > 1)
+	{
+		if (strcmp (argv[1], "-on") == 0)
+		{
+			showtabs = 1;
+		}
+		else if (strcmp (argv[1], "-off") == 0)
+		{
+			showtabs = 0;
+		}
+	}
+	else
+		showtabs = !showtabs;
+
+	redraw ();
+}
+
+void display_init ()
+{
+	initscr ();
+	raw ();
+	noecho ();
+
+	nonl ();
+	intrflush (stdscr, FALSE);
+	keypad (stdscr, TRUE);
+
+	start_color ();
+	use_default_colors ();
+
+	lineno   = 1;
+	showtabs = 0;
+
+	resize_handler ();
+
+	if (getenv ("ESCDELAY") == NULL)
+		ESCDELAY = 50;
+
+	add_command ("delay",    cmd_delay);
+	add_command ("lineno",   cmd_lineno);
+	add_command ("showtabs", cmd_showtabs);
+
+	init_pair (1, COLOR_CYAN,    -1);
+	init_pair (2, COLOR_RED,     -1);
+	init_pair (3, COLOR_MAGENTA, -1);
+	init_pair (4, COLOR_GREEN,   -1);
+	init_pair (5, COLOR_WHITE, COLOR_GREEN);
+
+}
+
+void display_fini ()
+{
+	nocbreak ();
+	endwin ();
+}
+          
+void display_beep ()
+{
+	beep ();
+};
 
 void display_redraw_title ()
 {
@@ -646,7 +647,7 @@ void display_do_menu (menu_t * menu)
 	done = 0;
 	while (done == 0)
 	{
-		display_nextevent ();
+		next_event ();
 
 		if (!strcmp(e->key, "esc")) {
 			done = 1;
