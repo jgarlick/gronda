@@ -267,9 +267,7 @@ void cmd_tdm  (int argc, char *argv[]);
 void cmd_wc   (int argc, char *argv[]);
 
 /* required display functions */
-void    display_init (void);   // remove
-
-void    display_fini (void);
+void    display_close (void);
 void    display_do_menu (menu_t *);
 void    display_finish_menu ();
 void    display_beep ();

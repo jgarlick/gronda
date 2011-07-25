@@ -66,7 +66,7 @@ main (int argc, char **argv)
 	keydef_t *keydef;
 
 	editor_setup(argc, argv);
-	display_init ();
+	display_open ();
 	redraw();
 
 	/* start timer */

@@ -167,7 +167,7 @@ void next_event ()
 	}
 }
 
-void display_init ()
+void display_open ()
 {
 	initscr ();
 	raw ();
@@ -200,7 +200,7 @@ void display_init ()
 
 }
 
-void display_fini ()
+void display_close ()
 {
 	nocbreak ();
 	endwin ();

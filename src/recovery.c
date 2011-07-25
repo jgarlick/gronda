@@ -216,7 +216,7 @@ void handle_error (int signal)
 		sprintf (s, "Unhandled signal (%d)", signal);
 	}
 
-	display_fini ();
+	display_close ();
 
 	crash_file_write ();
 

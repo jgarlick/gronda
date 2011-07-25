@@ -17,6 +17,7 @@ void cmd_lineno (int argc, char *argv[]);
 void cmd_showtabs (int argc, char *argv[]);
 
 /* display.c */
+void display_open (void);
 void next_event (void);
 
 extern struct ttysize dimensions;

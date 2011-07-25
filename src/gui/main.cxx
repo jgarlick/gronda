@@ -9,36 +9,12 @@ extern "C" {
 #include "../include/editor.h"
 }
 
-void display_fini ()
+void display_close ()
 {
 }
 
 void display_beep ()
 {
-}
-
-void display_redraw_title ()
-{
-}
-
-void display_redraw_stats ()
-{
-}
-
-void display_redraw_command ()
-{
-}
-
-void display_redraw_output ()
-{
-}
-
-void display_redraw_line (int y, line_t *l)
-{
-}
-
-void display_redraw_curs ()
-{    
 }
 
 void display_do_menu (menu_t * menu)

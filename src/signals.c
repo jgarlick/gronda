@@ -91,7 +91,7 @@ void sig_cleanexit (char *str, ...)
 
 	va_list argp;
 
-	display_fini ();
+	display_close ();
 
 	editor_fini ();
 
@@ -112,7 +112,7 @@ void sig_die (char *str, ...)
 
 	va_list argp;
 
-	display_fini ();
+	display_close ();
 
 	va_start (argp, str);
 	vasprintf (&out, str, argp);
