@@ -11,6 +11,11 @@
 /* main.c */
 void resize (void);
 
+/* cmd_terminal.c */
+void cmd_delay (int argc, char *argv[]);
+void cmd_lineno (int argc, char *argv[]);
+void cmd_showtabs (int argc, char *argv[]);
+
 /* display.c */
 void next_event (void);
 

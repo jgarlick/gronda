@@ -167,54 +167,6 @@ void next_event ()
 	}
 }
 
-void cmd_delay (int argc, char *argv[])
-{
-	int     delay = atoi (argv[1]);
-
-	ESCDELAY = delay;
-
-	output_message_c (argv[0], "Esc delay changed to %d ms", delay);
-	debug ("Delay changed to %s milliseconds", argv[1]);
-}
-
-void cmd_lineno (int argc, char *argv[])
-{
-	if (argc > 1)
-	{
-		if (strcmp (argv[1], "-on") == 0)
-		{
-			lineno = 1;
-		}
-		else if (strcmp (argv[1], "-off") == 0)
-		{
-			lineno = 0;
-		}
-	}
-	else
-		lineno = !lineno;
-
-	resize ();
-}
-
-void cmd_showtabs (int argc, char *argv[])
-{
-	if (argc > 1)
-	{
-		if (strcmp (argv[1], "-on") == 0)
-		{
-			showtabs = 1;
-		}
-		else if (strcmp (argv[1], "-off") == 0)
-		{
-			showtabs = 0;
-		}
-	}
-	else
-		showtabs = !showtabs;
-
-	redraw ();
-}
-
 void display_init ()
 {
 	initscr ();
