@@ -31,21 +31,7 @@ void editor_init ()
 	e->occupied_window = EDIT_WINDOW;
 
 	/* new pad */
-	e->pad_head = ALLOC (pad_t);
-	if (e->pad_head == NULL)
-	{
-		debug ("(main.c) Unable to allocate memory for e->pad_head");
-		exit (1);
-	}
-	e->pad_head->line_head = LINE_new_lines ();
-	e->pad_head->curs_x = 1;
-	e->pad_head->curs_y = 1;
-	e->pad_head->flags |= FILE_WRITE;
-
-	/* initial values for width and height must be non-zero */
-	e->pad_head->width = 10;
-	e->pad_head->height = 10;
-
+	e->pad_head = pad_new();
 	e->cpad = e->pad_head;
 
 	e->input = ALLOC (input_t);

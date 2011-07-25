@@ -167,17 +167,6 @@ void next_event ()
 	}
 }
 
-
-void display_max_pad_dim (int *width, int *height)
-{
-	if (lineno)
-		*width = dimensions.ts_cols - 6;
-	else
-		*width = dimensions.ts_cols;
-
-	*height = dimensions.ts_lines - 2;
-}
-
 void cmd_delay (int argc, char *argv[])
 {
 	int     delay = atoi (argv[1]);

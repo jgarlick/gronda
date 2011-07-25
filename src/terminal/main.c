@@ -14,27 +14,36 @@
  *            editor initialisation and finalisation
  *  authors : James Garlick
  */
+#include <curses.h>
+#include <term.h>
+
 #include <sys/time.h>
 #include <string.h>
 
 #include "../include/editor.h"
 #include "include/display.h"
 
+void get_viewport_size (int *width, int *height)
+{
+	if (lineno)
+		*width = dimensions.ts_cols - 6;
+	else
+		*width = dimensions.ts_cols;
+
+	*height = dimensions.ts_lines - 2;
+}
+
+
 void
 resize ()
 {
 	pad_t  *mover;
+	int width, height;
+	
+	get_viewport_size(&width, &height);
 
 	for (mover = e->pad_head; mover; mover = mover->next)
-	{
-		display_max_pad_dim (&(mover->width), &(mover->height));
-
-		if (mover->curs_x > mover->width)
-			mover->curs_x = mover->width;
-
-		if (mover->curs_y > mover->height)
-			mover->curs_y = mover->height;
-	}
+		pad_set_viewport_size(mover, width, height);
 
 	if (e->dm)
 		free (e->dm);

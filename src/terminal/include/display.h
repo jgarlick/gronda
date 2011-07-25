@@ -10,4 +10,7 @@
 
 void next_event (void);
 
+extern struct ttysize dimensions;
+extern int lineno;
+
 #endif

@@ -9,10 +9,6 @@ extern "C" {
 #include "../include/editor.h"
 }
 
-void display_max_pad_dim (int *width, int *height)
-{
-}
-
 void display_fini ()
 {
 }

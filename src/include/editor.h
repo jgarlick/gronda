@@ -178,6 +178,10 @@ void    editor_setup (int, char **);
 
 void    resize ();
 
+/* pad.c */
+pad_t *pad_new(void);
+void pad_set_viewport_size(pad_t *, int, int);
+
 /* signals.c */
 void    sig_init (void);
 void    sig_handler (int);
@@ -274,7 +278,6 @@ void cmd_wc   (int argc, char *argv[]);
 void    display_init (void);   // remove
 
 void    display_fini (void);
-void    display_max_pad_dim (int *, int *);
 void    display_redraw_title (void);
 void    display_redraw_stats (void);
 void    display_redraw_command (void);
