@@ -39,7 +39,7 @@ public:
     : Fl_Window( w, h, t ) { }
 };
 
-class CommandView : public Fl_Widget {
+class InputViewport : public Fl_Widget {
 	int input_start;
 protected:
 	void draw() {
@@ -54,16 +54,16 @@ protected:
 		fl_color(line_color);
 		fl_rect(x(), y(), w(), h() );
 		fl_color(text_color);
-		fl_draw("Command: ", x() + 3, y() + 2 + fl_height() - fl_descent());
+		fl_draw("Command: ", x() + 3, y() + 4 + fl_height() - fl_descent());
 	}
 public:
-    CommandView(int X, int Y, int W, int H, const char *l=0)
+    InputViewport(int X, int Y, int W, int H, const char *l=0)
 	: Fl_Widget(X,Y,W,H,l) {
 		input_start = fl_width("Command: ");
 	}
 };
 
-class OutputView : public Fl_Widget {
+class OutputViewport : public Fl_Widget {
 protected:
 	void draw() {
 		char buf[80];
@@ -77,17 +77,28 @@ protected:
 		fl_color(line_color);
 		fl_rect(x(), y(), w(), h() );
 		fl_color(text_color);
-		fl_draw(buffer, x() + 3, y() + 2 + fl_height() - fl_descent());
+		fl_draw(buffer, x() + 3, y() + 4 + fl_height() - fl_descent());
 	}
 public:
-    OutputView(int X, int Y, int W, int H, const char *l=0)
+    OutputViewport(int X, int Y, int W, int H, const char *l=0)
 	: Fl_Widget(X,Y,W,H,l) {
 	}
 };
 
-class EditView : public Fl_Widget {
+class EditViewport : public Fl_Widget {
 protected:
 	int viewport_w, viewport_h;
+
+	void set_viewport_size(int W, int H) {
+		viewport_w = W / font_size;
+		viewport_h = H / fl_height();
+		pad_set_viewport_size(e->cpad, viewport_w, viewport_h);
+	}
+
+	void resize(int X, int Y, int W, int H) {
+		set_viewport_size(W, H);
+	  	Fl_Widget::resize(X,Y,W,H);
+	}
 
 	void draw() {
 		char buf[80];
@@ -154,17 +165,15 @@ protected:
 //		fl_draw("Command: ", x() + 1, y() + fl_height() - fl_descent());
 	}
 public:
-    EditView(int X, int Y, int W, int H, const char *l=0)
+    EditViewport(int X, int Y, int W, int H, const char *l=0)
 	: Fl_Widget(X,Y,W,H,l) {
-		viewport_w = W / font_size;
-		viewport_h = (H / fl_height())-1;
-		pad_set_viewport_size(e->cpad, viewport_w, viewport_h);
+		set_viewport_size(W, H);
 	}
 };
 
-EditView    *edit_view;
-OutputView  *output_view;
-CommandView *command_view;
+EditViewport   *edit_viewport;
+OutputViewport *output_viewport;
+InputViewport  *input_viewport;
 
 struct keycode_table{int n; const char* text;} table[] = {
   {FL_Escape, "FL_Escape"},
@@ -266,8 +275,8 @@ int MyWindow::handle(int e) {
 	} else {
 		sprintf(buffer, "%s", fl_eventnames[e]);
 	}
-	edit_view->redraw();
-	output_view->redraw();
+	edit_viewport->redraw();
+	output_viewport->redraw();
 	
 	return (1); // eat all keystrokes
 }
@@ -281,7 +290,7 @@ int main(int argc, char **argv) {
 	editor_setup(argc, argv);
 
 	bg_color    = fl_rgb_color(254, 255, 231);
-	line_color = fl_rgb_color(71, 43, 198);
+	line_color  = fl_rgb_color(71, 43, 198);
 	text_color  = fl_rgb_color(0, 0, 0);
 
 	MyWindow *window = new MyWindow(640,480);
@@ -289,16 +298,16 @@ int main(int argc, char **argv) {
 	fl_font(font, font_size);
 	font_height = fl_height();
 	font_width  = (int)fl_width(' ');
-	io_height = font_height + 4;
+	io_height = font_height + 8;
 
-	edit_view = new EditView(0, 0, 640, 480 - io_height);
+	edit_viewport = new EditViewport(0, 0, 640, 480 - io_height);
 
 	Fl_Group *bottom_section = new Fl_Group(0, 480 - io_height, 640, io_height);
-	command_view = new CommandView(0, 480 - io_height, 321, io_height);
-	output_view  = new OutputView(319,480 - io_height, 321, io_height);
+	input_viewport  = new InputViewport(0, 480 - io_height, 321, io_height);
+	output_viewport = new OutputViewport(319,480 - io_height, 321, io_height);
 	bottom_section->end();
 
-	window->resizable(*edit_view);
+	window->resizable(*edit_viewport);
 	window->show();
 	Fl::focus(window);
 	return(Fl::run());
