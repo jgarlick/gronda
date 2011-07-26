@@ -25,7 +25,7 @@ void display_finish_menu ()
 {
 }
 
-
+Fl_Color bg_color, line_color, text_color;
 
 char buffer[100];
 
@@ -49,10 +49,11 @@ protected:
 		fl_font(font, font_size);
 		
 //		fl_font(FL_SCREEN, 16);
-		fl_color(FL_WHITE);
+		fl_color(bg_color);
 		fl_rectf(x(), y(), w(), h() );
-		fl_color(FL_BLACK);
+		fl_color(line_color);
 		fl_rect(x(), y(), w(), h() );
+		fl_color(text_color);
 		fl_draw("Command: ", x() + 3, y() + 2 + fl_height() - fl_descent());
 	}
 public:
@@ -71,10 +72,11 @@ protected:
 		fl_font(font, font_size);
 		
 //		fl_font(FL_SCREEN, 16);
-		fl_color(FL_WHITE);
+		fl_color(bg_color);
 		fl_rectf(x(), y(), w(), h() );
-		fl_color(FL_BLACK);
+		fl_color(line_color);
 		fl_rect(x(), y(), w(), h() );
+		fl_color(text_color);
 		fl_draw(buffer, x() + 3, y() + 2 + fl_height() - fl_descent());
 	}
 public:
@@ -100,16 +102,19 @@ protected:
 //		fl_font(FL_SCREEN, 16);
 		
 		fl_font(font, font_size);
-		fl_color(FL_WHITE);
+		fl_color(bg_color);
 		fl_rectf(x(), y(), w(), h() );
 
-		fl_color(FL_BLACK);
-		fl_rectf(x() + 1, y() + 1, w() - 2, fl_height() + 4 );
+		fl_color(line_color);
+		fl_line(x(), y() + 2, x(), h());
+		fl_line(w() - 1, y() + 2, w() - 1, h());
 
-		fl_color(FL_WHITE);
-		fl_draw((e->cpad->filename ? e->cpad->filename : "(new file)"), x() + 3, y() + 2 + fl_height() - fl_descent());
+		fl_rectf(x() + 3, y() + 2, w() - 6, fl_height() + 4 );
 
-		fl_color(FL_BLACK);
+		fl_color(bg_color);
+		fl_draw((e->cpad->filename ? e->cpad->filename : "(new file)"), x() + 7, y() + 4 + fl_height() - fl_descent());
+
+		fl_color(text_color);
 //		fl_rect(x(), y(), w(), h() );
 		yp = y() + 6 + (fl_height() * 2 - fl_descent());
 		line = LINE_get_line_at (e->cpad, 1);
@@ -136,7 +141,7 @@ protected:
 					str = empty_string;
 			}
 			
-			fl_draw(str, x(), yp);
+			fl_draw(str, x() + 4, yp);
 			yp += fl_height();
 			
 			if (line != e->cpad->line_head)
@@ -275,6 +280,10 @@ int main(int argc, char **argv) {
 
 	editor_setup(argc, argv);
 
+	bg_color    = fl_rgb_color(254, 255, 231);
+	line_color = fl_rgb_color(71, 43, 198);
+	text_color  = fl_rgb_color(0, 0, 0);
+
 	MyWindow *window = new MyWindow(640,480);
 
 	fl_font(font, font_size);
@@ -286,7 +295,7 @@ int main(int argc, char **argv) {
 
 	Fl_Group *bottom_section = new Fl_Group(0, 480 - io_height, 640, io_height);
 	command_view = new CommandView(0, 480 - io_height, 321, io_height);
-	output_view  = new OutputView(320,480 - io_height, 320, io_height);
+	output_view  = new OutputView(319,480 - io_height, 321, io_height);
 	bottom_section->end();
 
 	window->resizable(*edit_view);
