@@ -39,7 +39,7 @@ public:
     : Fl_Window( w, h, t ) { }
 };
 
-class CommandPad : public Fl_Widget {
+class CommandView : public Fl_Widget {
 	int input_start;
 protected:
 	void draw() {
@@ -56,17 +56,45 @@ protected:
 		fl_draw("Command: ", x() + 3, y() + 2 + fl_height() - fl_descent());
 	}
 public:
-    CommandPad(int X, int Y, int W, int H, const char *l=0)
+    CommandView(int X, int Y, int W, int H, const char *l=0)
 	: Fl_Widget(X,Y,W,H,l) {
 		input_start = fl_width("Command: ");
 	}
 };
 
-class EditPad : public Fl_Widget {
+class OutputView : public Fl_Widget {
 protected:
 	void draw() {
 		char buf[80];
+		
+//		sprintf(buf, "%d / %f / %d / %d", fl_height(), fl_width(' '), fl_descent(), y());
+		fl_font(font, font_size);
+		
+//		fl_font(FL_SCREEN, 16);
+		fl_color(FL_WHITE);
+		fl_rectf(x(), y(), w(), h() );
+		fl_color(FL_BLACK);
+		fl_rect(x(), y(), w(), h() );
+		fl_draw(buffer, x() + 3, y() + 2 + fl_height() - fl_descent());
+	}
+public:
+    OutputView(int X, int Y, int W, int H, const char *l=0)
+	: Fl_Widget(X,Y,W,H,l) {
+	}
+};
+
+class EditView : public Fl_Widget {
+protected:
+	int viewport_w, viewport_h;
+
+	void draw() {
+		char buf[80];
 		int yp;
+		int i;
+		line_t *line;
+		char *str;
+		int offset, intab;
+		char empty_string[1] = "";
 		
 //		sprintf(buf, "%d / %f / %d / %d", fl_height(), fl_width(' '), fl_descent(), y());
 //		fl_font(FL_SCREEN, 16);
@@ -79,25 +107,59 @@ protected:
 		fl_rectf(x() + 1, y() + 1, w() - 2, fl_height() + 4 );
 
 		fl_color(FL_WHITE);
-		fl_draw("pad0001", x() + 3, y() + 2 + fl_height() - fl_descent());
+		fl_draw((e->cpad->filename ? e->cpad->filename : "(new file)"), x() + 3, y() + 2 + fl_height() - fl_descent());
 
 		fl_color(FL_BLACK);
 //		fl_rect(x(), y(), w(), h() );
 		yp = y() + 6 + (fl_height() * 2 - fl_descent());
-		fl_draw(buffer, x() + 3, yp);
+		line = LINE_get_line_at (e->cpad, 1);
+		if (line == NULL)
+			line = e->cpad->line_head;
+			
+		for (i = 0; i < viewport_h; i++) {
+			intab  = 0;
+			
+			if (line == e->cpad->line_head)
+			{
+				str = empty_string;
+			}
+			else if (line == NULL || line->str == NULL)
+			{
+				str = empty_string;
+			}
+			else
+			{
+				offset = get_string_pos (e->cpad->offset_x + 1, line->str->data, &intab);
+				if ((size_t)offset < strlen (line->str->data))
+					str = line->str->data + offset;
+				else
+					str = empty_string;
+			}
+			
+			fl_draw(str, x(), yp);
+			yp += fl_height();
+			
+			if (line != e->cpad->line_head)
+				line = line->next;
+		}
+/*		fl_draw(buffer, x(), yp);
 		yp += fl_height();
-		fl_draw("line 2 Command", x(), yp);
+		fl_draw("line 2 Command", x(), yp);*/
 
 //		fl_draw("Command: ", x() + 1, y() + fl_height() - fl_descent());
 	}
 public:
-    EditPad(int X, int Y, int W, int H, const char *l=0)
+    EditView(int X, int Y, int W, int H, const char *l=0)
 	: Fl_Widget(X,Y,W,H,l) {
+		viewport_w = W / font_size;
+		viewport_h = (H / fl_height())-1;
+		pad_set_viewport_size(e->cpad, viewport_w, viewport_h);
 	}
 };
 
-EditPad *edit_pad;
-
+EditView    *edit_view;
+OutputView  *output_view;
+CommandView *command_view;
 
 struct keycode_table{int n; const char* text;} table[] = {
   {FL_Escape, "FL_Escape"},
@@ -199,7 +261,9 @@ int MyWindow::handle(int e) {
 	} else {
 		sprintf(buffer, "%s", fl_eventnames[e]);
 	}
-	edit_pad->redraw();
+	edit_view->redraw();
+	output_view->redraw();
+	
 	return (1); // eat all keystrokes
 }
 
@@ -211,7 +275,6 @@ int main(int argc, char **argv) {
 
 	editor_setup(argc, argv);
 
-//	Fl::add_handler(handle);
 	MyWindow *window = new MyWindow(640,480);
 
 	fl_font(font, font_size);
@@ -219,29 +282,14 @@ int main(int argc, char **argv) {
 	font_width  = (int)fl_width(' ');
 	io_height = font_height + 4;
 
-	edit_pad = new EditPad(0, 0, 640, 480 - io_height);
+	edit_view = new EditView(0, 0, 640, 480 - io_height);
 
-//	Fl_Text_Buffer *sbuff = new Fl_Text_Buffer();	// style buffer
-	//	int stable_size = sizeof(stable)/sizeof(stable[0]);	// # entries in style table (4)
-//	edit_window->highlight_data(sbuff, stable, stable_size, 'A', 0, 0);
-
-
-//	Fl_Text_Display *command_window = new Fl_Text_Display(0, 460, 640, 10);
-//	Fl_Group *pad_window = new Fl_Group(0,0, 640, 10);
-
-	Fl_Group *bottom_section = new Fl_Group(0,480 - io_height, 640, io_height);
-	CommandPad *command_pad = new CommandPad(0,480 - io_height,319,io_height,"Hello, World1");
-//	command_window->box(FL_BORDER_FRAME);
-	Fl_Box *output_window = new Fl_Box(320,480 - io_height, 320, io_height, "Hello, World2");
+	Fl_Group *bottom_section = new Fl_Group(0, 480 - io_height, 640, io_height);
+	command_view = new CommandView(0, 480 - io_height, 321, io_height);
+	output_view  = new OutputView(320,480 - io_height, 320, io_height);
 	bottom_section->end();
 
-/*	command_buffer = new Fl_Text_Buffer();
-	command_window->buffer(command_buffer);*/
-
-//	sbuff->text("AAAAAAAAAA\nBBBBBBBBBB\nCCCCCCCCCC\nDDDDDDDDDD\n"
-//     "AAAAAAAAAA\nBBBBBBBBBB\nCCCCCCCCCC\nDDDDDDDDDD\n");
-
-	window->resizable(*edit_pad);
+	window->resizable(*edit_view);
 	window->show();
 	Fl::focus(window);
 	return(Fl::run());
