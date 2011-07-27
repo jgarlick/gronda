@@ -178,6 +178,7 @@ void    editor_setup (int, char **);
 /* pad.c */
 pad_t *pad_new(void);
 void pad_set_viewport_size(pad_t *, int, int);
+char pad_get_char_at (pad_t *p, int y, int x);
 
 /* signals.c */
 void    sig_init (void);

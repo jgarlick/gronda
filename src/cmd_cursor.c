@@ -17,61 +17,6 @@
 
 #include <string.h>
 
-/* get the character at the given co-ordinates in a pad, */
-/* accounting for tabs */
-/* THIS IS NOT BEING USED BY ANYTHING AT THE MOMENT */
-char get_char_at (pad_t *p, int y, int x)
-{
-	line_t *l;
-	char   *c;
-	char   r = 0;
-	int    a;
-	int    offset_l;
-	int    offset_r;
-	int    width;
-
-	l = LINE_get_line_at (p, y);
-	offset_r = 0;
-
-	if (l != NULL && l->str != NULL)
-	{
-		c = l->str->data;
-
-		a = 0;
-		while (*c && a < x - 1)
-		{
-			if (*c == '\t')
-			{
-				width = 4;
-				a += width; /* TODO: tab stops */
-			}
-			else
-				a++;
-
-			if (a < x) c++;
-		}
-
-		r = *c;
-	}
-
-	offset_l = x - a - 1;
-	debug ("    OFFSET IS: %d", offset_l);
-
-	if (offset_l != 0)
-	{
-		offset_l += width;
-		offset_r = width - offset_l;
-	}
-
-
-	debug ("    OFFSET_L IS: %d", offset_l);
-	debug ("    OFFSET_R IS: %d", offset_r);
-	debug ("VALUE OF X IS: %d", x);
-	debug ("VALUE OF R IS: '%c'", r);
-
-	return r;
-}
-
 void cmd_au (int argc, char *argv[])
 {
 	int scroll = 0;

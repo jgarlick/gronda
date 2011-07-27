@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Text_Display.H>
@@ -90,8 +92,8 @@ protected:
 	int viewport_w, viewport_h;
 
 	void set_viewport_size(int W, int H) {
-		viewport_w = W / font_size;
-		viewport_h = H / fl_height();
+		viewport_w = floor((W - 6) / fl_width(' '));
+		viewport_h = floor((H - 6) / fl_height()) - 1;
 		pad_set_viewport_size(e->cpad, viewport_w, viewport_h);
 	}
 
@@ -108,27 +110,33 @@ protected:
 		char *str;
 		int offset, intab;
 		char empty_string[1] = "";
+		int y_start;
 		
 //		sprintf(buf, "%d / %f / %d / %d", fl_height(), fl_width(' '), fl_descent(), y());
 //		fl_font(FL_SCREEN, 16);
 		
 		fl_font(font, font_size);
-		fl_color(bg_color);
-		fl_rectf(x(), y(), w(), h() );
 
+		/* background */
+		fl_color(bg_color);
+		fl_rectf(x(), y(), w(), h());
+
+		/* lines at sides */
 		fl_color(line_color);
 		fl_line(x(), y() + 2, x(), h());
 		fl_line(w() - 1, y() + 2, w() - 1, h());
 
+		/* top bar */
 		fl_rectf(x() + 3, y() + 2, w() - 6, fl_height() + 4 );
 
 		fl_color(bg_color);
 		fl_draw((e->cpad->filename ? e->cpad->filename : "(new file)"), x() + 7, y() + 4 + fl_height() - fl_descent());
 
+		/* edit text */
 		fl_color(text_color);
-//		fl_rect(x(), y(), w(), h() );
-		yp = y() + 6 + (fl_height() * 2 - fl_descent());
-		line = LINE_get_line_at (e->cpad, 1);
+		y_start = y() + 6 + (fl_height() * 2 - fl_descent());
+		yp = y_start;
+		line = LINE_get_line_at (e->cpad, 1 + e->cpad->offset_y);
 		if (line == NULL)
 			line = e->cpad->line_head;
 			
@@ -152,12 +160,21 @@ protected:
 					str = empty_string;
 			}
 			
-			fl_draw(str, x() + 4, yp);
+			fl_draw(str, x() + 3, yp);
 			yp += fl_height();
 			
 			if (line != e->cpad->line_head)
 				line = line->next;
 		}
+		
+		/* cursor */
+		fl_color(line_color);
+		fl_rectf(x() + 3 + (fl_width(' ') * (e->cpad->curs_x - 1)), y_start + (fl_height() * (e->cpad->curs_y - 2)) + fl_descent(), fl_width(' '), fl_height() );
+		fl_color(bg_color);
+		sprintf(buf, "%c", pad_get_char_at(e->cpad, e->cpad->curs_x + e->cpad->offset_x, e->cpad->curs_y + e->cpad->offset_y));
+		fl_draw(buf, x() + 3 + (fl_width(' ') * (e->cpad->curs_x - 1)), y_start + (fl_height() * (e->cpad->curs_y - 1)));
+
+		
 /*		fl_draw(buffer, x(), yp);
 		yp += fl_height();
 		fl_draw("line 2 Command", x(), yp);*/
@@ -171,29 +188,30 @@ public:
 	}
 };
 
+MyWindow       *window;
 EditViewport   *edit_viewport;
 OutputViewport *output_viewport;
 InputViewport  *input_viewport;
 
 struct keycode_table{int n; const char* text;} table[] = {
-  {FL_Escape, "FL_Escape"},
-  {FL_BackSpace, "FL_BackSpace"},
-  {FL_Tab, "FL_Tab"},
-  {FL_Enter, "FL_Enter"},
+  {FL_Escape, "esc"},
+  {FL_BackSpace, "bs"},
+  {FL_Tab, "tab"},
+  {FL_Enter, "enter"},
   {FL_Print, "FL_Print"},
   {FL_Scroll_Lock, "FL_Scroll_Lock"},
   {FL_Pause, "FL_Pause"},
-  {FL_Insert, "FL_Insert"},
-  {FL_Home, "FL_Home"},
-  {FL_Page_Up, "FL_Page_Up"},
-  {FL_Delete, "FL_Delete"},
-  {FL_End, "FL_End"},
-  {FL_Page_Down, "FL_Page_Down"},
-  {FL_Left, "FL_Left"},
-  {FL_Up, "FL_Up"},
-  {FL_Right, "FL_Right"},
-  {FL_Down, "FL_Down"},
-  {FL_Shift_L, "FL_Shift_L"},
+  {FL_Insert, "ins"},
+  {FL_Home, "home"},
+  {FL_Page_Up, "pgup"},
+  {FL_Delete, "del"},
+  {FL_End, "end"},
+  {FL_Page_Down, "pgdown"},
+  {FL_Left, "left"},
+  {FL_Up, "up"},
+  {FL_Right, "right"},
+  {FL_Down, "down"},
+  {FL_Shift_L, ""},
   {FL_Shift_R, "FL_Shift_R"},
   {FL_Control_L, "FL_Control_L"},
   {FL_Control_R, "FL_Control_R"},
@@ -212,6 +230,7 @@ int MyWindow::handle(int e) {
 	char buffer2[100];
 	char eventname[100];
     const char *keyname = buffer;
+	keydef_t *keydef;
 
 	if (e == FL_FOCUS) {
 		printf ("got focus\n");
@@ -229,15 +248,15 @@ int MyWindow::handle(int e) {
 		strcpy(eventname, "other");
 //		eventname[0] = '\0';
 	}
-	if (e == FL_KEYDOWN || e == FL_KEYUP) {
+	if (e == FL_KEYDOWN/* || e == FL_KEYUP*/) {
 	    int k = Fl::event_key();
 		int mods = Fl::event_state();
 	    if (!k)
 	      keyname = "0";
 	    else if (k < 256) {
-	      sprintf(buffer, "'%c'", k);
+	      sprintf(buffer, "%c", k);
 	    } else if (k > FL_F && k <= FL_F_Last) {
-	      sprintf(buffer, "FL_F+%d", k - FL_F);
+	      sprintf(buffer, "F%d", k - FL_F);
 	    } else if (k >= FL_KP && k <= FL_KP_Last) {
 	      sprintf(buffer, "FL_KP+'%c'", k-FL_KP);
 	    } else if (k >= FL_Button && k <= FL_Button+7) {
@@ -252,29 +271,41 @@ int MyWindow::handle(int e) {
 	    }
 		if (mods & FL_SHIFT) {
 			strcpy(buffer2, buffer);
-			sprintf(buffer, "Shift + %s", buffer2);
+			sprintf(buffer, "%sS", buffer2);
 		}
 		if (mods & FL_CTRL) {
 			strcpy(buffer2, buffer);
-			sprintf(buffer, "Ctrl + %s", buffer2);
+			sprintf(buffer, "^%s", buffer2);
 		}
 		if (mods & FL_ALT) {
 			strcpy(buffer2, buffer);
-			sprintf(buffer, "ALT + %s", buffer2);
+			sprintf(buffer, "*%s", buffer2);
 		}
 		if (mods & FL_META) {
 			strcpy(buffer2, buffer);
-			sprintf(buffer, "META + %s", buffer2);
+			sprintf(buffer, "~%s", buffer2);
 		}
-		strcpy(buffer2, buffer);
-		sprintf(buffer, "%s %s", fl_eventnames[e], buffer2);
-	} else if (e == FL_MOVE || e == FL_DRAG || FL_MOUSEWHEEL) {
+/*		if (e == FL_KEYUP) {
+			strcpy(buffer2, buffer);
+			sprintf(buffer, "%sU", buffer2);
+		}*/
+//		strcpy(buffer2, buffer);
+//		sprintf(buffer, "%s %s", fl_eventnames[e], buffer2);
+	} else if (e == FL_MOVE || e == FL_DRAG || e == FL_MOUSEWHEEL) {
 		sprintf(buffer, "%s (%d, %d)", fl_eventnames[e], Fl::event_x(), Fl::event_y());
 	} else if (e == FL_PUSH) {
 		sprintf(buffer, "%s %d", fl_eventnames[e], Fl::event_button());
 	} else {
 		sprintf(buffer, "%s", fl_eventnames[e]);
 	}
+
+	keydef = KEY_find (buffer);
+
+	if (keydef)
+	{
+		parse ("%s", keydef->def);
+	}
+
 	edit_viewport->redraw();
 	output_viewport->redraw();
 	
@@ -293,7 +324,7 @@ int main(int argc, char **argv) {
 	line_color  = fl_rgb_color(71, 43, 198);
 	text_color  = fl_rgb_color(0, 0, 0);
 
-	MyWindow *window = new MyWindow(640,480);
+	window = new MyWindow(640,480);
 
 	fl_font(font, font_size);
 	font_height = fl_height();
@@ -307,6 +338,7 @@ int main(int argc, char **argv) {
 	output_viewport = new OutputViewport(319,480 - io_height, 321, io_height);
 	bottom_section->end();
 
+//	window->border(0); /* remove window manager titles and border */
 	window->resizable(*edit_viewport);
 	window->show();
 	Fl::focus(window);
