@@ -41,7 +41,7 @@ void debug (char *str, ...)
 	}
 }
 
-void parse (char *format, ...)
+void parse (const char *format, ...)
 {
 	char   *str;
 	va_list argp;

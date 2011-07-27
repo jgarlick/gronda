@@ -202,7 +202,7 @@ buffer_t *buffer_load (char *file_name);
 void    debug (char *, ...);
 void    output_message (char *, ...);
 void    output_message_c (char *, char *, ...);
-void    parse (char *, ...);
+void    parse (const char *, ...);
 
 int     vasprintf (char **, const char *, va_list);
 
