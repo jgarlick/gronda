@@ -34,63 +34,13 @@ char buffer[100];
 int font = FL_SCREEN;
 int font_size = 14;
 
-class MyWindow : public Fl_Window {
-  int handle(int);
-public:
-  MyWindow(int w, int h, const char *t=0L) 
-    : Fl_Window( w, h, t ) { }
-};
-
-class InputViewport : public Fl_Widget {
-	int input_start;
-protected:
-	void draw() {
-		char buf[80];
-		
-//		sprintf(buf, "%d / %f / %d / %d", fl_height(), fl_width(' '), fl_descent(), y());
-		fl_font(font, font_size);
-		
-//		fl_font(FL_SCREEN, 16);
-		fl_color(bg_color);
-		fl_rectf(x(), y(), w(), h() );
-		fl_color(line_color);
-		fl_rect(x(), y(), w(), h() );
-		fl_color(text_color);
-		fl_draw("Command: ", x() + 3, y() + 4 + fl_height() - fl_descent());
-	}
-public:
-    InputViewport(int X, int Y, int W, int H, const char *l=0)
-	: Fl_Widget(X,Y,W,H,l) {
-		input_start = fl_width("Command: ");
-	}
-};
-
-class OutputViewport : public Fl_Widget {
-protected:
-	void draw() {
-		char buf[80];
-		
-//		sprintf(buf, "%d / %f / %d / %d", fl_height(), fl_width(' '), fl_descent(), y());
-		fl_font(font, font_size);
-		
-//		fl_font(FL_SCREEN, 16);
-		fl_color(bg_color);
-		fl_rectf(x(), y(), w(), h() );
-		fl_color(line_color);
-		fl_rect(x(), y(), w(), h() );
-		fl_color(text_color);
-		fl_draw(buffer, x() + 3, y() + 4 + fl_height() - fl_descent());
-	}
-public:
-    OutputViewport(int X, int Y, int W, int H, const char *l=0)
-	: Fl_Widget(X,Y,W,H,l) {
-	}
-};
+int mouse_to_cursor = 1;
 
 class EditViewport : public Fl_Widget {
-protected:
+public:
 	int viewport_w, viewport_h;
-
+	
+protected:
 	void set_viewport_size(int W, int H) {
 		viewport_w = floor((W - 6) / fl_width(' '));
 		viewport_h = floor((H - 6) / fl_height()) - 1;
@@ -186,10 +136,93 @@ public:
 	: Fl_Widget(X,Y,W,H,l) {
 		set_viewport_size(W, H);
 	}
+	
+	void move_cursor(int X, int Y) {
+		int new_x, new_y;
+		
+		if (mouse_to_cursor) {
+			new_x = floor((X + 3) / fl_width(' '));
+			new_y = floor((Y + 6) / fl_height()) - 1;
+		
+			if (new_x > 0 && new_x <= viewport_w && new_y > 0 && new_y <= viewport_h) {
+				e->cpad->curs_x = new_x;
+				e->cpad->curs_y = new_y;
+			}
+		}
+	}
+
+	int in_edit_window(int X, int Y) {
+		return (X > 3 && X < w() - 3 && Y > (6 + fl_height()) && Y < (6 + ((viewport_h + 1) * fl_height()) + fl_descent()));
+	}
 };
 
-MyWindow       *window;
 EditViewport   *edit_viewport;
+
+
+class MyWindow : public Fl_Window {
+	int handle(int);
+
+	void set_mouse_cursor(int X, int Y) {
+		if (mouse_to_cursor && edit_viewport->in_edit_window(X, Y)) {
+			fl_cursor(FL_CURSOR_NONE);
+		} else {
+			fl_cursor(FL_CURSOR_DEFAULT);
+		}
+	}
+
+public:
+	MyWindow(int w, int h, const char *t=0L) 
+		: Fl_Window( w, h, t ) { }
+};
+
+class InputViewport : public Fl_Widget {
+	int input_start;
+protected:
+	void draw() {
+		char buf[80];
+		
+//		sprintf(buf, "%d / %f / %d / %d", fl_height(), fl_width(' '), fl_descent(), y());
+		fl_font(font, font_size);
+		
+//		fl_font(FL_SCREEN, 16);
+		fl_color(bg_color);
+		fl_rectf(x(), y(), w(), h() );
+		fl_color(line_color);
+		fl_rect(x(), y(), w(), h() );
+		fl_color(text_color);
+		fl_draw("Command: ", x() + 3, y() + 4 + fl_height() - fl_descent());
+	}
+public:
+    InputViewport(int X, int Y, int W, int H, const char *l=0)
+	: Fl_Widget(X,Y,W,H,l) {
+		input_start = fl_width("Command: ");
+	}
+};
+
+class OutputViewport : public Fl_Widget {
+protected:
+	void draw() {
+		char buf[80];
+		
+//		sprintf(buf, "%d / %f / %d / %d", fl_height(), fl_width(' '), fl_descent(), y());
+		fl_font(font, font_size);
+		
+//		fl_font(FL_SCREEN, 16);
+		fl_color(bg_color);
+		fl_rectf(x(), y(), w(), h() );
+		fl_color(line_color);
+		fl_rect(x(), y(), w(), h() );
+		fl_color(text_color);
+		fl_draw(buffer, x() + 3, y() + 4 + fl_height() - fl_descent());
+	}
+public:
+    OutputViewport(int X, int Y, int W, int H, const char *l=0)
+	: Fl_Widget(X,Y,W,H,l) {
+	}
+};
+
+
+MyWindow       *window;
 OutputViewport *output_viewport;
 InputViewport  *input_viewport;
 
@@ -299,6 +332,11 @@ int MyWindow::handle(int e) {
 		sprintf(buffer, "%s", fl_eventnames[e]);
 	}
 
+	if (e == FL_MOVE) {
+		edit_viewport->move_cursor(Fl::event_x(), Fl::event_y());
+		set_mouse_cursor(Fl::event_x(), Fl::event_y());
+	}
+
 	keydef = KEY_find (buffer);
 
 	if (keydef)
@@ -312,6 +350,22 @@ int MyWindow::handle(int e) {
 	return (1); // eat all keystrokes
 }
 
+extern "C" void cmd_mouse (int argc, char *argv[])
+{
+	if (argc > 1)
+	{
+		if (strcmp (argv[1], "-on") == 0)
+		{
+			mouse_to_cursor = 1;
+		}
+		else if (strcmp (argv[1], "-off") == 0)
+		{
+			mouse_to_cursor = 0;
+		}
+	}
+	else
+		mouse_to_cursor = !mouse_to_cursor;
+}
 
 int main(int argc, char **argv) {
 	int font_height;
@@ -319,6 +373,7 @@ int main(int argc, char **argv) {
 	int io_height;
 
 	editor_setup(argc, argv);
+	add_command ("mouse",    (void (*)())cmd_mouse);
 
 	bg_color    = fl_rgb_color(254, 255, 231);
 	line_color  = fl_rgb_color(71, 43, 198);
