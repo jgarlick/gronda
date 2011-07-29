@@ -60,11 +60,30 @@ protected:
 		char *str;
 		int offset, intab;
 		char empty_string[1] = "";
-		int y_start;
+		int lines_start_y;
+		pad_t *pad;
+
+		int start_y = 0;
+		int start_x = 0;
+		int end_y   = 0;
+		int end_x   = 0;
+
 		
 //		sprintf(buf, "%d / %f / %d / %d", fl_height(), fl_width(' '), fl_descent(), y());
 //		fl_font(FL_SCREEN, 16);
+
+		pad = e->cpad;
 		
+		if (pad->echo)
+		{
+			get_region (pad->echo, &start_y, &start_x, &end_y, &end_x);
+
+			start_y -= pad->offset_y + 1;
+			start_x -= pad->offset_x + 1;
+			end_y   -= pad->offset_y + 1;
+			end_x   -= pad->offset_x + 1;
+		}
+
 		fl_font(font, font_size);
 
 		/* background */
@@ -80,20 +99,28 @@ protected:
 		fl_rectf(x() + 3, y() + 2, w() - 6, fl_height() + 4 );
 
 		fl_color(bg_color);
-		fl_draw((e->cpad->filename ? e->cpad->filename : "(new file)"), x() + 7, y() + 4 + fl_height() - fl_descent());
+		fl_draw((pad->filename ? pad->filename : "(new file)"), x() + 7, y() + 4 + fl_height() - fl_descent());
 
+		lines_start_y = y() + 6 + (fl_height() * 2 - fl_descent());
+
+		/* highlight background */
+		if (pad->echo == REGION_RECT)
+		{
+			fl_color(line_color);
+			fl_rectf(x() + 3 + (fl_width(' ') * start_x), lines_start_y + (fl_height() * (start_y - 1)) + fl_descent(), fl_width(' ') * (end_x - start_x), fl_height() * ((end_y - start_y) + 1));
+		}
+		
 		/* edit text */
 		fl_color(text_color);
-		y_start = y() + 6 + (fl_height() * 2 - fl_descent());
-		yp = y_start;
-		line = LINE_get_line_at (e->cpad, 1 + e->cpad->offset_y);
+		yp = lines_start_y;
+		line = LINE_get_line_at (pad, 1 + pad->offset_y);
 		if (line == NULL)
-			line = e->cpad->line_head;
+			line = pad->line_head;
 			
 		for (i = 0; i < viewport_h; i++) {
 			intab  = 0;
 			
-			if (line == e->cpad->line_head)
+			if (line == pad->line_head)
 			{
 				str = empty_string;
 			}
@@ -103,7 +130,7 @@ protected:
 			}
 			else
 			{
-				offset = get_string_pos (e->cpad->offset_x + 1, line->str->data, &intab);
+				offset = get_string_pos (pad->offset_x + 1, line->str->data, &intab);
 				if ((size_t)offset < strlen (line->str->data))
 					str = line->str->data + offset;
 				else
@@ -113,16 +140,20 @@ protected:
 			fl_draw(str, x() + 3, yp);
 			yp += fl_height();
 			
-			if (line != e->cpad->line_head)
+			if (line != pad->line_head)
 				line = line->next;
 		}
 		
 		/* cursor */
 		fl_color(line_color);
-		fl_rectf(x() + 3 + (fl_width(' ') * (e->cpad->curs_x - 1)), y_start + (fl_height() * (e->cpad->curs_y - 2)) + fl_descent(), fl_width(' '), fl_height() );
-		fl_color(bg_color);
-		sprintf(buf, "%c", pad_get_char_at(e->cpad, e->cpad->curs_x + e->cpad->offset_x, e->cpad->curs_y + e->cpad->offset_y));
-		fl_draw(buf, x() + 3 + (fl_width(' ') * (e->cpad->curs_x - 1)), y_start + (fl_height() * (e->cpad->curs_y - 1)));
+		if (pad->echo == REGION_RECT && start_x != end_x && start_y != end_y) {
+			fl_rect(x() + 3 + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (fl_height() * (pad->curs_y - 2)) + fl_descent(), fl_width(' '), fl_height() );			
+		} else {
+			fl_rectf(x() + 3 + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (fl_height() * (pad->curs_y - 2)) + fl_descent(), fl_width(' '), fl_height() );
+			fl_color(bg_color);
+			sprintf(buf, "%c", pad_get_char_at(pad, pad->curs_x + pad->offset_x, pad->curs_y + pad->offset_y));
+			fl_draw(buf, x() + 3 + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (fl_height() * (pad->curs_y - 1)));
+		}
 
 		
 /*		fl_draw(buffer, x(), yp);
