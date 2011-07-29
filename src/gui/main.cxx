@@ -1,4 +1,5 @@
 #include <math.h>
+#include <string.h>
 
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
@@ -31,8 +32,12 @@ Fl_Color bg_color, line_color, text_color;
 
 char buffer[100];
 
+#if defined(__APPLE__)
 int font = FL_SCREEN;
-int font_size = 14;
+#else
+int font = FL_COURIER;
+#endif
+int font_size = 13;
 
 int mouse_to_cursor = 1;
 
