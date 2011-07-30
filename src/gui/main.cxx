@@ -319,11 +319,19 @@ int MyWindow::handle(int e) {
 	}
 	if (e == FL_KEYDOWN/* || e == FL_KEYUP*/) {
 	    int k = Fl::event_key();
+		int c = Fl::event_text()[0]; // text for the key, handles shift+standard keypress
 		int mods = Fl::event_state();
+
 	    if (!k)
 	      keyname = "0";
 	    else if (k < 256) {
-	      sprintf(buffer, "%c", k);
+			if (k == '\'') {
+				sprintf(buffer, "squote");
+			} else if (k == '"') {
+				sprintf(buffer, "dquote");
+			} else {
+	      		sprintf(buffer, "%c", c);
+			}
 	    } else if (k > FL_F && k <= FL_F_Last) {
 	      sprintf(buffer, "F%d", k - FL_F);
 	    } else if (k >= FL_KP && k <= FL_KP_Last) {
@@ -338,7 +346,7 @@ int MyWindow::handle(int e) {
 			strcpy(buffer, keyname);
 		}
 	    }
-		if (mods & FL_SHIFT) {
+		if ((mods & FL_SHIFT) && k > 255) {
 			strcpy(buffer2, buffer);
 			sprintf(buffer, "%sS", buffer2);
 		}
