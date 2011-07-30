@@ -77,13 +77,13 @@ void editor_setup (int argc, char **argv)
 			}
 			else if (*s == 'v' || !strcasecmp (s, "-version"))
 			{
-				sig_cleanexit ("%s (v%s)\nhttp://gronda.sourceforge.net\n\n",
+				sig_cleanexit ("%s (v%s)\nhttps://github.com/jgarlick/gronda\n\n",
 							   EDITOR_NAME, EDITOR_VERSION);
 			}
 			else if (*s == 'h' || !strcasecmp (s, "-help"))
 			{
 				sig_cleanexit
-					("Usage: ge [--debug] [--version] [--help] [filename]\n");
+					("Usage: gronda [--debug] [--version] [--help] [filename]\n");
 			}
 		}
 		else
