@@ -10,4 +10,11 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    Gronda is a text editor based loosely on the Apollo AEGIS DM Editor.
+    Gronda is a text editor inspired by the AEGIS Display Manager editor 
+    found on Apollo/Domain workstations. 
+
+    System Requirements:
+
+    Linux or Mac OS X
+    fltk 1.1 for the graphical interface
+    ncurses for the terminal interface
