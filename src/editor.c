@@ -32,17 +32,21 @@ void editor_init ()
 
 	/* new pad */
 	e->pad_head = pad_new();
-	e->cpad = e->pad_head;
+	e->cpad = e->cepad = e->pad_head;
+	
+	e->input_pad = pad_new();
 
+	/* temporary until terminal interface uses a pad for the input window */
 	e->input = ALLOC (input_t);
 	if (e->input == NULL)
 	{
 		debug ("(main.c) Unable to allocate memory for e->input");
 		exit (1);
 	}
-
 	e->input->offset = 0;
 	e->input->curs_x = 0;
+	
+	
 	e->flags |= INSERT;
 }
 

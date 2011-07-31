@@ -24,6 +24,7 @@ typedef enum
 	EDIT_WINDOW,
 	COMMAND_WINDOW,
 	COMMAND_WINDOW_REQUEST,
+	COMMAND_WINDOW_EXECUTE,
 	OUTPUT_WINDOW
 }
 occupied_window_t;
@@ -107,16 +108,13 @@ typedef struct buffer_s
 } buffer_t;
 
 /* command window */
-/* TODO: This should be a normal pad (need local key defs first) */
+/* temporary until terminal interface uses a pad for the input window */
 typedef struct input_s
 {
 	int     offset;
 	int     curs_x;
 
 	char    buffer[BUFFER_SIZE];
-
-//       char *current;
-
 }
 input_t;
 
@@ -138,10 +136,13 @@ typedef struct editor_s
 
 	input_t *input;				/* command window */
 
+	pad_t *input_pad;
+
 	buffer_t *buffer_head;      /* paste buffers */
 
-	pad_t  *pad_head;			/* linked list of pads */
-	pad_t  *cpad;				/* current pad */
+	pad_t  *pad_head;			/* linked list of edit pads */
+	pad_t  *cpad;				/* current pad, could be edit or input */
+	pad_t  *cepad;				/* current edit pad */
 
 	int     redraw;				/* redraw flags */
 	int     flags;

@@ -137,8 +137,6 @@ void execute_command (int argc, char *argv[])
 
 		if (e->occupied_window == COMMAND_WINDOW_REQUEST)
 			e->occupied_window = COMMAND_WINDOW;
-		else
-			e->occupied_window = EDIT_WINDOW;
 	}
 	else
 		output_message_c (*argv, "Unknown command");

@@ -73,11 +73,7 @@ protected:
 		int end_y   = 0;
 		int end_x   = 0;
 
-		
-//		sprintf(buf, "%d / %f / %d / %d", fl_height(), fl_width(' '), fl_descent(), y());
-//		fl_font(FL_SCREEN, 16);
-
-		pad = e->cpad;
+		pad = e->cepad;
 		
 		if (pad->echo)
 		{
@@ -129,7 +125,7 @@ protected:
 			{
 				str = empty_string;
 			}
-			else if (line == NULL || line->str == NULL)
+				else if (line == NULL || line->str == NULL)
 			{
 				str = empty_string;
 			}
@@ -150,16 +146,17 @@ protected:
 		}
 		
 		/* cursor */
-		fl_color(line_color);
-		if (pad->echo == REGION_RECT && start_x != end_x && start_y != end_y) {
-			fl_rect(x() + 3 + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (fl_height() * (pad->curs_y - 2)) + fl_descent(), fl_width(' '), fl_height() );			
-		} else {
-			fl_rectf(x() + 3 + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (fl_height() * (pad->curs_y - 2)) + fl_descent(), fl_width(' '), fl_height() );
-			fl_color(bg_color);
-			sprintf(buf, "%c", pad_get_char_at(pad, pad->curs_x + pad->offset_x, pad->curs_y + pad->offset_y));
-			fl_draw(buf, x() + 3 + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (fl_height() * (pad->curs_y - 1)));
+		if (e->occupied_window == EDIT_WINDOW) {
+			fl_color(line_color);
+			if (pad->echo == REGION_RECT && start_x != end_x && start_y != end_y) {
+				fl_rect(x() + 3 + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (fl_height() * (pad->curs_y - 2)) + fl_descent(), fl_width(' '), fl_height() );			
+			} else {
+				fl_rectf(x() + 3 + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (fl_height() * (pad->curs_y - 2)) + fl_descent(), fl_width(' '), fl_height() );
+				fl_color(bg_color);
+				sprintf(buf, "%c", pad_get_char_at(pad, pad->curs_x + pad->offset_x, pad->curs_y + pad->offset_y));
+				fl_draw(buf, x() + 3 + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (fl_height() * (pad->curs_y - 1)));
+			}
 		}
-
 		
 /*		fl_draw(buffer, x(), yp);
 		yp += fl_height();
@@ -181,6 +178,10 @@ public:
 			new_y = floor((Y + 6) / fl_height()) - 1;
 		
 			if (new_x > 0 && new_x <= viewport_w && new_y > 0 && new_y <= viewport_h) {
+				if (e->occupied_window != EDIT_WINDOW) {
+					e->occupied_window = EDIT_WINDOW;
+					e->cpad = e->cepad;
+				}
 				e->cpad->curs_x = new_x;
 				e->cpad->curs_y = new_y;
 			}
@@ -216,17 +217,37 @@ class InputViewport : public Fl_Widget {
 protected:
 	void draw() {
 		char buf[80];
+		line_t *line;
+		pad_t  *pad = e->input_pad;
+		char *str;
+		int offset, intab;
 		
-//		sprintf(buf, "%d / %f / %d / %d", fl_height(), fl_width(' '), fl_descent(), y());
 		fl_font(font, font_size);
 		
-//		fl_font(FL_SCREEN, 16);
 		fl_color(bg_color);
 		fl_rectf(x(), y(), w(), h() );
 		fl_color(line_color);
 		fl_rect(x(), y(), w(), h() );
 		fl_color(text_color);
 		fl_draw("Command: ", x() + 3, y() + 4 + fl_height() - fl_descent());
+
+		line = pad->line_head->prev;
+		if (line != pad->line_head && line->str && line->str->data) {
+			offset = get_string_pos (pad->offset_x + 1, line->str->data, &intab);
+			if ((size_t)offset < strlen (line->str->data))
+				str = line->str->data + offset;
+			else
+				str = NULL;
+
+			if (str)
+				fl_draw(str, x() + 3 + (fl_width(' ') * 9), y() + 4 + fl_height() - fl_descent());
+		}
+
+		if(e->occupied_window == COMMAND_WINDOW) {
+			/* cursor */
+			fl_color(line_color);
+			fl_rectf(x() + 3 + (fl_width(' ') * 9) + (fl_width(' ') * (pad->curs_x - 1)), y() + 4, fl_width(' '), fl_height() );
+		}
 	}
 public:
     InputViewport(int X, int Y, int W, int H, const char *l=0)
@@ -240,10 +261,8 @@ protected:
 	void draw() {
 		char buf[80];
 		
-//		sprintf(buf, "%d / %f / %d / %d", fl_height(), fl_width(' '), fl_descent(), y());
 		fl_font(font, font_size);
 		
-//		fl_font(FL_SCREEN, 16);
 		fl_color(bg_color);
 		fl_rectf(x(), y(), w(), h() );
 		fl_color(line_color);
@@ -389,6 +408,7 @@ int MyWindow::handle(int e) {
 	}
 
 	edit_viewport->redraw();
+	input_viewport->redraw();
 	output_viewport->redraw();
 	
 	return (1); // eat all keystrokes

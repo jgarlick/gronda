@@ -161,7 +161,10 @@ void cmd_en (int argc, char *argv[])
 		pad->curs_y++;
 	}
 
-	pad_modified (pad);
+	if (e->occupied_window == COMMAND_WINDOW)
+		e->occupied_window = COMMAND_WINDOW_EXECUTE;
+	else
+		pad_modified (pad);
 }
 
 /* ED: Edit Delete ('delete') */

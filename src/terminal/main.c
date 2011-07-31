@@ -91,6 +91,7 @@ main (int argc, char **argv)
 					if (*(e->input->buffer))
 					{
 						debug ("To Parser: %s", e->input->buffer);
+						e->occupied_window = EDIT_WINDOW;
 						parse ("%s", e->input->buffer);
 						memset (e->input->buffer, 0, BUFFER_SIZE);
 						e->input->curs_x = 0;

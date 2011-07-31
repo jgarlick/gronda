@@ -45,16 +45,28 @@ void parse (const char *format, ...)
 {
 	char   *str;
 	va_list argp;
+	line_t *line;
+
+	if (e->occupied_window == COMMAND_WINDOW) {
+		e->cpad = e->input_pad;
+	} else {
+		e->cpad = e->cepad;
+	}
 
 	va_start (argp, format);
 	vasprintf (&str, format, argp);
 	va_end (argp);
 
-	debug ("sending %s", str);
 	yy_scan_string (str);
 	yylex ();
-	debug ("sent");
 	free (str);
+
+	if (e->occupied_window == COMMAND_WINDOW_EXECUTE) {
+		e->occupied_window = EDIT_WINDOW;
+		line = e->input_pad->line_head->prev->prev;
+		if (line != e->input_pad->line_head && line->str && line->str->data)
+			parse(line->str->data);
+	}
 }
 
 void output_message (char *str, ...)
