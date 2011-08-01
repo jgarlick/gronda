@@ -321,11 +321,9 @@ int MyWindow::handle(int e) {
 	keydef_t *keydef;
 
 	if (e == FL_FOCUS) {
-		printf ("got focus\n");
 		return 1;
 	}
 	if (e == FL_ENTER) {
-		printf ("got enter\n");
 		return 1;
 	}
 	if (e == FL_KEYDOWN) {
