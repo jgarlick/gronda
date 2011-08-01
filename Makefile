@@ -4,7 +4,7 @@
 
 BINARY_NAME     = gronda
 EDITOR_NAME     = "Gronda"
-EDITOR_VERSION  = "0.3.9c"
+EDITOR_VERSION  = "0.4.0pre1"
 
 CC      = gcc
 CFLAGS  = -ggdb3 -Wall -Isrc/include -DLINUX -DEDITOR_NAME='$(EDITOR_NAME)' -DEDITOR_VERSION='$(EDITOR_VERSION)' -DYY_NO_UNPUT
