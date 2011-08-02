@@ -15,6 +15,11 @@ kd left  'al' ke
 kd up 'au -s' ke
 kd down 'ad -s' ke
 
+kd rightS ph ke
+kd leftS 'ph -1' ke
+kd upS 'pv -1' ke
+kd downS pv ke
+
 kd F1    'dr;echo' ke
 kd F1S   'dr;echo -r' ke 
 kd F2    xc ke
