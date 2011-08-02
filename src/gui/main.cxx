@@ -30,8 +30,6 @@ void display_finish_menu ()
 
 Fl_Color bg_color, line_color, text_color;
 
-char buffer[100];
-
 #if defined(__APPLE__)
 int font = FL_SCREEN;
 #else
@@ -268,7 +266,7 @@ protected:
 		fl_color(line_color);
 		fl_rect(x(), y(), w(), h() );
 		fl_color(text_color);
-		fl_draw(buffer, x() + 3, y() + 4 + fl_height() - fl_descent());
+//		fl_draw(buffer, x() + 3, y() + 4 + fl_height() - fl_descent());
 	}
 public:
     OutputViewport(int X, int Y, int W, int H, const char *l=0)
@@ -299,26 +297,19 @@ struct keycode_table{int n; const char* text;} table[] = {
   {FL_Up, "up"},
   {FL_Right, "right"},
   {FL_Down, "down"},
-  {FL_Shift_L, ""},
-  {FL_Shift_R, "FL_Shift_R"},
-  {FL_Control_L, "FL_Control_L"},
-  {FL_Control_R, "FL_Control_R"},
   {FL_Caps_Lock, "FL_Caps_Lock"},
-  {FL_Alt_L, "FL_Alt_L"},
-  {FL_Alt_R, "FL_Alt_R"},
-  {FL_Meta_L, "FL_Meta_L"},
-  {FL_Meta_R, "FL_Meta_R"},
-  {FL_Menu, "FL_Menu"},
-  {FL_Help, "FL_Help"},
-  {FL_Num_Lock, "FL_Num_Lock"},
-  {FL_KP_Enter, "FL_KP_Enter"}
+//  {FL_Menu, "FL_Menu"},
+//  {FL_Help, "FL_Help"},
+//  {FL_Num_Lock, "FL_Num_Lock"},
+//  {FL_KP_Enter, "FL_KP_Enter"}
 };
 
 int MyWindow::handle(int e) {
-	char buffer2[100];
-	char eventname[100];
-    const char *keyname = buffer;
+	char buffer1[100];
+	char *buffer;
 	keydef_t *keydef;
+	int k, c, mods;
+	int len;
 
 	if (e == FL_FOCUS) {
 		return 1;
@@ -326,28 +317,26 @@ int MyWindow::handle(int e) {
 	if (e == FL_ENTER) {
 		return 1;
 	}
-	if (e == FL_KEYDOWN) {
-		strcpy(eventname, "keydown");
-	} else if (e == FL_KEYUP) {
-		strcpy(eventname, "keyup");
-	} else {
-		strcpy(eventname, "other");
-//		eventname[0] = '\0';
-	}
-	if (e == FL_KEYDOWN/* || e == FL_KEYUP*/) {
-	    int k = Fl::event_key();
-		int c = Fl::event_text()[0]; // text for the key, handles shift+standard keypress
-		int mods = Fl::event_state();
 
-	    if (!k)
-	      keyname = "0";
-	    else if (k < 256) {
+	// start 5 characters in so that we can add characters to the front of the string
+	buffer = buffer1 + 5;
+
+	buffer[0] = '\0';
+	mods = Fl::event_state();
+	
+	if (e == FL_KEYDOWN || e == FL_KEYUP) {
+	    k = Fl::event_key();
+
+		if (k > 0 && k < 256) {
+			if (mods == FL_SHIFT) // shift only, no other modifiers
+				k = Fl::event_text()[0]; // text for the key, handles shift+standard keypress
+
 			if (k == '\'') {
 				sprintf(buffer, "squote");
 			} else if (k == '"') {
 				sprintf(buffer, "dquote");
 			} else {
-	      		sprintf(buffer, "%c", c);
+      			sprintf(buffer, "%c", k);
 			}
 	    } else if (k > FL_F && k <= FL_F_Last) {
 	      sprintf(buffer, "F%d", k - FL_F);
@@ -356,57 +345,55 @@ int MyWindow::handle(int e) {
 	    } else if (k >= FL_Button && k <= FL_Button+7) {
 	      sprintf(buffer, "FL_Button+%d", k-FL_Button);
 	    } else {
-	      sprintf(buffer, "0x%04x", k);
 	      for (int i = 0; i < int(sizeof(table)/sizeof(*table)); i++)
-			if (table[i].n == k) {keyname = table[i].text; break;}
-		  if (strlen(keyname) > 0) {
-			strcpy(buffer, keyname);
+			if (table[i].n == k) { strcpy(buffer, table[i].text); break;}
 		}
-	    }
-		if ((mods & FL_SHIFT) && k > 255) {
-			strcpy(buffer2, buffer);
-			sprintf(buffer, "%sS", buffer2);
-		}
-		if (mods & FL_CTRL) {
-			strcpy(buffer2, buffer);
-			sprintf(buffer, "^%s", buffer2);
-		}
-		if (mods & FL_ALT) {
-			strcpy(buffer2, buffer);
-			sprintf(buffer, "*%s", buffer2);
-		}
-		if (mods & FL_META) {
-			strcpy(buffer2, buffer);
-			sprintf(buffer, "~%s", buffer2);
-		}
-/*		if (e == FL_KEYUP) {
-			strcpy(buffer2, buffer);
-			sprintf(buffer, "%sU", buffer2);
-		}*/
-//		strcpy(buffer2, buffer);
-//		sprintf(buffer, "%s %s", fl_eventnames[e], buffer2);
-	} else if (e == FL_MOVE || e == FL_DRAG || e == FL_MOUSEWHEEL) {
-		sprintf(buffer, "%s (%d, %d)", fl_eventnames[e], Fl::event_x(), Fl::event_y());
-	} else if (e == FL_PUSH) {
-		sprintf(buffer, "%s %d", fl_eventnames[e], Fl::event_button());
-	} else {
-		sprintf(buffer, "%s", fl_eventnames[e]);
+	} else if (e == FL_PUSH || e == FL_RELEASE) {
+		sprintf(buffer, "M%d", Fl::event_button());
 	}
 
-	if (e == FL_MOVE) {
+	if (e == FL_MOVE || e == FL_DRAG) {
 		edit_viewport->move_cursor(Fl::event_x(), Fl::event_y());
 		set_mouse_cursor(Fl::event_x(), Fl::event_y());
+		edit_viewport->redraw();
 	}
 
-	keydef = KEY_find (buffer);
+	len = strlen(buffer);
+	if (len > 0) {
+		// don't add S to regular keys e.g. shift+a, but add them when another modifier key
+		// is also pressed e.g. shift+ctrl+a generates ^aS
+		if ((mods & FL_SHIFT) && (e == FL_PUSH || e == FL_RELEASE || k > 255 || mods != FL_SHIFT)) {
+			buffer[len]     = 'S';
+			buffer[len + 1] = '\0';
+		}
+		if (mods & FL_META) {
+			buffer--;
+			*buffer = '~';
+		}
+		if (mods & FL_ALT) {
+			buffer--;
+			*buffer = '*';
+		}
+		if (mods & FL_CTRL) {
+			buffer--;
+			*buffer = '^';
+		}
 
-	if (keydef)
-	{
-		parse ("%s", keydef->def);
+		if (e == FL_RELEASE || e == FL_KEYUP) {
+			len = strlen(buffer);
+			buffer[len]     = 'U';
+			buffer[len + 1] = '\0';
+		}
+
+//		printf("key find %s\n", buffer);
+		keydef = KEY_find (buffer);
+
+		if (keydef)
+			parse ("%s", keydef->def);
+
+		edit_viewport->redraw();
+		input_viewport->redraw();
 	}
-
-	edit_viewport->redraw();
-	input_viewport->redraw();
 	output_viewport->redraw();
 	
 	return (1); // eat all keystrokes

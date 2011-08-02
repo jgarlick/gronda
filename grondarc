@@ -10,6 +10,10 @@ kd pgdown 'pv 10' ke
 kd pgup 'pv -10' ke
 kd home tl ke
 kd end tr ke
+kd right 'ar' ke
+kd left  'al' ke
+kd up 'au -s' ke
+kd down 'ad -s' ke
 
 kd F1    'dr;echo' ke
 kd F1S   'dr;echo -r' ke 
@@ -20,15 +24,15 @@ kd F3S   'xd -r' ke
 kd F4    xp ke
 kd F4S   'xp -r' ke
 kd F5 'xd line_del' ke
-kd F8 wc ke
+kd F8 'pw;wc' ke
 
+kd M1 'dr;echo' ke
+kd M1U xc ke
+kd M1S 'dr;echo -r' ke
+kd M1SU 'xc -r' ke
+
+kd ^s pw ke
 kd ^q wc ke
-
-
-kd right 'ar' ke
-kd left  'al' ke
-kd up 'au -s' ke
-kd down 'ad -s' ke
 
 showtabs -off
 
