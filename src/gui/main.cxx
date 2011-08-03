@@ -171,18 +171,16 @@ public:
 	void move_cursor(int X, int Y) {
 		int new_x, new_y;
 		
-		if (mouse_to_cursor) {
-			new_x = floor((X + 3) / fl_width(' '));
-			new_y = floor((Y + 6) / fl_height()) - 1;
-		
-			if (new_x > 0 && new_x <= viewport_w && new_y > 0 && new_y <= viewport_h) {
-				if (e->occupied_window != EDIT_WINDOW) {
-					e->occupied_window = EDIT_WINDOW;
-					e->cpad = e->cepad;
-				}
-				e->cpad->curs_x = new_x;
-				e->cpad->curs_y = new_y;
+		new_x = floor((X + 3) / fl_width(' '));
+		new_y = floor((Y + 6) / fl_height()) - 1;
+	
+		if (new_x > 0 && new_x <= viewport_w && new_y > 0 && new_y <= viewport_h) {
+			if (e->occupied_window != EDIT_WINDOW) {
+				e->occupied_window = EDIT_WINDOW;
+				e->cpad = e->cepad;
 			}
+			e->cpad->curs_x = new_x;
+			e->cpad->curs_y = new_y;
 		}
 	}
 
@@ -353,7 +351,8 @@ int MyWindow::handle(int e) {
 	}
 
 	if (e == FL_MOVE || e == FL_DRAG) {
-		edit_viewport->move_cursor(Fl::event_x(), Fl::event_y());
+		if (mouse_to_cursor)
+			edit_viewport->move_cursor(Fl::event_x(), Fl::event_y());
 		set_mouse_cursor(Fl::event_x(), Fl::event_y());
 		edit_viewport->redraw();
 	}
@@ -416,13 +415,19 @@ extern "C" void cmd_mouse (int argc, char *argv[])
 		mouse_to_cursor = !mouse_to_cursor;
 }
 
+extern "C" void cmd_sic (int argc, char *argv[])
+{
+	edit_viewport->move_cursor(Fl::event_x(), Fl::event_y());
+}
+
 int main(int argc, char **argv) {
 	int font_height;
 	int font_width;
 	int io_height;
 
 	editor_setup(argc, argv);
-	add_command ("mouse",    (void (*)())cmd_mouse);
+	add_command ("mouse",  (void (*)())cmd_mouse);
+	add_command ("sic",    (void (*)())cmd_sic);
 
 	bg_color    = fl_rgb_color(254, 255, 231);
 	line_color  = fl_rgb_color(71, 43, 198);

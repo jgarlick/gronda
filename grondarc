@@ -31,9 +31,9 @@ kd F4S   'xp -r' ke
 kd F5 'xd line_del' ke
 kd F8 'pw;wc' ke
 
-kd M1 'dr;echo' ke
+kd M1 'sic;dr;echo' ke
 kd M1U xc ke
-kd M1S 'dr;echo -r' ke
+kd M1S 'sic;dr;echo -r' ke
 kd M1SU 'xc -r' ke
 
 kd ^s pw ke
