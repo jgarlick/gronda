@@ -103,6 +103,11 @@ protected:
 		sprintf(buf, "%d", pad->offset_y + 1);
 		fl_draw(buf, x() + w() - (7 + fl_width(' ') * strlen(buf)), y() + 5 + fl_height() - fl_descent());
 
+		if (pad->offset_x > 0) {
+			sprintf(buf, "%d", pad->offset_x + 1);
+			fl_draw(buf, x() + w() - (123 + fl_width(' ') * strlen(buf)), y() + 5 + fl_height() - fl_descent());			
+		}
+
 		fl_rectf(x() + w() - 113, y() + 4, 19, fl_height() + 2);
 
 		fl_color(line_color);
