@@ -237,7 +237,19 @@ public:
 
 class InputViewport : public Fl_Widget {
 	int input_start;
+	int viewport_w;
+	char prompt[100];
 protected:
+	void set_viewport_size(int W, int H) {
+		int viewport_w = floor((W - (fl_width(prompt) + 6)) / fl_width(' '));
+		pad_set_viewport_size(e->input_pad, viewport_w, 1);
+	}
+
+	void resize(int X, int Y, int W, int H) {
+		set_viewport_size(W, H);
+	  	Fl_Widget::resize(X,Y,W,H);
+	}
+	
 	void draw() {
 		char buf[80];
 		line_t *line;
@@ -248,11 +260,11 @@ protected:
 		fl_font(font, font_size);
 		
 		fl_color(bg_color);
-		fl_rectf(x(), y(), w(), h() );
+		fl_rectf(x(), y(), w(), h());
 		fl_color(line_color);
-		fl_rect(x(), y(), w(), h() );
+		fl_rect(x(), y(), w(), h());
 		fl_color(text_color);
-		fl_draw("Command: ", x() + 3, y() + 4 + fl_height() - fl_descent());
+		fl_draw(prompt, x() + 3, y() + 4 + fl_height() - fl_descent());
 
 		line = pad->line_head->prev;
 		if (line != pad->line_head && line->str && line->str->data) {
@@ -263,19 +275,24 @@ protected:
 				str = NULL;
 
 			if (str)
-				fl_draw(str, x() + 3 + (fl_width(' ') * 9), y() + 4 + fl_height() - fl_descent());
+				fl_draw(str, x() + 3 + fl_width(prompt), y() + 4 + fl_height() - fl_descent());
 		}
 
 		if(e->occupied_window == COMMAND_WINDOW) {
 			/* cursor */
 			fl_color(line_color);
-			fl_rectf(x() + 3 + (fl_width(' ') * 9) + (fl_width(' ') * (pad->curs_x - 1)), y() + 4, fl_width(' '), fl_height() );
+			fl_rectf(x() + 3 + fl_width(prompt) + (fl_width(' ') * (pad->curs_x - 1)), y() + 4, fl_width(' '), fl_height() );
 		}
 	}
 public:
+	void set_prompt(const char *str) {
+		strcpy(prompt, str);
+		input_start = fl_width(prompt);
+	}
     InputViewport(int X, int Y, int W, int H, const char *l=0)
 	: Fl_Widget(X,Y,W,H,l) {
-		input_start = fl_width("Command: ");
+		set_prompt("Command: ");
+		set_viewport_size(W, H);
 	}
 };
 
