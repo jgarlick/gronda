@@ -46,7 +46,7 @@ public:
 protected:
 	void set_viewport_size(int W, int H) {
 		viewport_w = floor((W - 6) / fl_width(' '));
-		viewport_h = floor((H - 6) / fl_height()) - 1;
+		viewport_h = floor((H - 8) / fl_height()) - 1;
 		pad_set_viewport_size(e->cpad, viewport_w, viewport_h);
 	}
 
@@ -95,15 +95,28 @@ protected:
 		fl_line(w() - 1, y() + 2, w() - 1, h());
 
 		/* top bar */
-		fl_rectf(x() + 3, y() + 2, w() - 6, fl_height() + 4 );
+		fl_rectf(x() + 3, y() + 2, w() - 6, fl_height() + 6 );
 
 		fl_color(bg_color);
-		fl_draw((pad->filename ? pad->filename : "(new file)"), x() + 7, y() + 4 + fl_height() - fl_descent());
+		fl_draw((pad->filename ? pad->filename : "(new file)"), x() + 7, y() + 5 + fl_height() - fl_descent());
 
 		sprintf(buf, "%d", pad->offset_y + 1);
-		fl_draw(buf, x() + w() - (7 + fl_width(' ') * strlen(buf)), y() + 4 + fl_height() - fl_descent());
+		fl_draw(buf, x() + w() - (7 + fl_width(' ') * strlen(buf)), y() + 5 + fl_height() - fl_descent());
 
-		lines_start_y = y() + 6 + (fl_height() * 2 - fl_descent());
+		fl_rectf(x() + w() - 113, y() + 4, 19, fl_height() + 2);
+
+		fl_color(line_color);
+		if (!(pad->flags & FILE_WRITE))
+			sprintf(buf, "R");
+		else if (e->flags & INSERT)
+			sprintf(buf, "I");
+		else
+			sprintf(buf, "O");
+		fl_draw(buf, x() + w() - (104 + fl_width(' ') / 2), y() + 5 + fl_height() - fl_descent());
+
+
+
+		lines_start_y = y() + 8 + (fl_height() * 2 - fl_descent());
 
 		/* highlight background */
 		if (pad->echo == REGION_RECT)
