@@ -100,6 +100,9 @@ protected:
 		fl_color(bg_color);
 		fl_draw((pad->filename ? pad->filename : "(new file)"), x() + 7, y() + 4 + fl_height() - fl_descent());
 
+		sprintf(buf, "%d", pad->offset_y + 1);
+		fl_draw(buf, x() + w() - (7 + fl_width(' ') * strlen(buf)), y() + 4 + fl_height() - fl_descent());
+
 		lines_start_y = y() + 6 + (fl_height() * 2 - fl_descent());
 
 		/* highlight background */
