@@ -105,11 +105,10 @@ protected:
 
 		if (pad->offset_x > 0) {
 			sprintf(buf, "%d", pad->offset_x + 1);
-			fl_draw(buf, x() + w() - (123 + fl_width(' ') * strlen(buf)), y() + 5 + fl_height() - fl_descent());			
+			fl_draw(buf, x() + w() - (130 + fl_width(' ') * strlen(buf)), y() + 5 + fl_height() - fl_descent());			
 		}
 
 		fl_rectf(x() + w() - 113, y() + 4, 19, fl_height() + 2);
-
 		fl_color(line_color);
 		if (!(pad->flags & FILE_WRITE))
 			sprintf(buf, "R");
@@ -118,6 +117,13 @@ protected:
 		else
 			sprintf(buf, "O");
 		fl_draw(buf, x() + w() - (104 + fl_width(' ') / 2), y() + 5 + fl_height() - fl_descent());
+
+		if (pad->flags & MODIFIED) {
+			fl_color(bg_color);
+			fl_rectf(x() + w() - 77, y() + 4, 19, fl_height() + 2);
+			fl_color(line_color);
+			fl_draw("M", x() + w() - (68 + fl_width(' ') / 2), y() + 5 + fl_height() - fl_descent());
+		}
 
 
 
