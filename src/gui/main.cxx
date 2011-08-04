@@ -61,6 +61,7 @@ protected:
 		int i;
 		line_t *line;
 		char *str;
+		int line_end, end;
 		int offset, intab;
 		char empty_string[1] = "";
 		int lines_start_y;
@@ -126,18 +127,16 @@ protected:
 		}
 
 
-
 		lines_start_y = y() + 8 + (fl_height() * 2 - fl_descent());
 
-		/* highlight background */
+		/* rectangular highlight background */
 		if (pad->echo == REGION_RECT)
 		{
 			fl_color(line_color);
 			fl_rectf(x() + 3 + (fl_width(' ') * start_x), lines_start_y + (fl_height() * (start_y - 1)) + fl_descent(), fl_width(' ') * (end_x - start_x), fl_height() * ((end_y - start_y) + 1));
 		}
 		
-		/* edit text */
-		fl_color(text_color);
+		/* draw the lines of text in the viewport window */
 		yp = lines_start_y;
 		line = LINE_get_line_at (pad, 1 + pad->offset_y);
 		if (line == NULL)
@@ -163,6 +162,31 @@ protected:
 					str = empty_string;
 			}
 			
+			/* linear highlight background for line */
+			if (pad->echo == REGION_LINEAR) {
+				// get the position that the cursor would be in at the end of the line
+				// taking hard tabs into account
+				line_end = get_curs_pos(strlen(str), line);// - pad->offset_x;
+				
+				if (i == start_y && start_x < line_end) {
+					if (start_y == end_y)
+						end = (line_end < end_x) ? line_end : end_x;
+					else
+						end = line_end;
+						
+					fl_color(line_color);
+					fl_rectf(x() + 3 + (fl_width(' ') * start_x), lines_start_y + (fl_height() * (start_y - 1)) + fl_descent(), fl_width(' ') * (end - start_x), fl_height());
+				} else if (i > start_y && i < end_y) {
+					fl_color(line_color);
+					fl_rectf(x() + 3, lines_start_y + (fl_height() * (i - 1)) + fl_descent(), fl_width(' ') * line_end, fl_height());
+				} else if (i == end_y && end_x > 0) {
+					end = (line_end < end_x) ? line_end : end_x;
+					fl_color(line_color);
+					fl_rectf(x() + 3, lines_start_y + (fl_height() * (i - 1)) + fl_descent(), fl_width(' ') * end, fl_height());
+				}
+			}
+			
+			fl_color(text_color);
 			fl_draw(str, x() + 3, yp);
 			yp += fl_height();
 			
@@ -173,7 +197,7 @@ protected:
 		/* cursor */
 		if (e->occupied_window == EDIT_WINDOW) {
 			fl_color(line_color);
-			if (pad->echo == REGION_RECT && start_x != end_x && start_y != end_y) {
+			if (pad->echo && !(start_x == end_x && start_y == end_y)) {
 				fl_rect(x() + 3 + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (fl_height() * (pad->curs_y - 2)) + fl_descent(), fl_width(' '), fl_height() );			
 			} else {
 				fl_rectf(x() + 3 + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (fl_height() * (pad->curs_y - 2)) + fl_descent(), fl_width(' '), fl_height() );
