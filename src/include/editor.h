@@ -192,7 +192,8 @@ buffer_t *buffer_load (char *file_name);
 /* tools.c */
 void    debug (char *, ...);
 void    output_message (char *, ...);
-void    output_message_c (char *, char *, ...);
+#define output_message_c(title, format, ...) output_message("(%s)" format "(%s)", title, ##__VA_ARGS__, title)
+
 void    parse (const char *, ...);
 
 int     vasprintf (char **, const char *, va_list);

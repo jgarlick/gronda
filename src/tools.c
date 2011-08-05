@@ -85,19 +85,6 @@ void output_message (char *format, ...)
 	free(buf);
 }
 
-void output_message_c (char *title, char *format, ...)
-{
-	char   *str;
-	va_list argp;
-
-	va_start (argp, format);
-	vasprintf (&str, format, argp);
-	va_end (argp);
-
-	output_message ("(%s) %s (%s)", title, str, title);
-	free (str);
-}
-
 #ifdef HPUX
 
 /* 
