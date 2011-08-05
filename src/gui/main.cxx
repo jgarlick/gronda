@@ -166,16 +166,18 @@ protected:
 			if (pad->echo == REGION_LINEAR) {
 				// get the position that the cursor would be in at the end of the line
 				// taking hard tabs into account
-				line_end = get_curs_pos(strlen(str), line);// - pad->offset_x;
+				line_end = get_curs_pos(strlen(str), line);
 				
-				if (i == start_y && start_x < line_end) {
-					if (start_y == end_y)
-						end = (line_end < end_x) ? line_end : end_x;
-					else
-						end = line_end;
+				if (i == start_y) {
+					if (start_x < line_end) {
+						if (start_y == end_y)
+							end = (line_end < end_x) ? line_end : end_x;
+						else
+							end = line_end;
 						
-					fl_color(line_color);
-					fl_rectf(x() + 3 + (fl_width(' ') * start_x), lines_start_y + (fl_height() * (start_y - 1)) + fl_descent(), fl_width(' ') * (end - start_x), fl_height());
+						fl_color(line_color);
+						fl_rectf(x() + 3 + (fl_width(' ') * start_x), lines_start_y + (fl_height() * (start_y - 1)) + fl_descent(), fl_width(' ') * (end - start_x), fl_height());
+					}
 				} else if (i > start_y && i < end_y) {
 					fl_color(line_color);
 					fl_rectf(x() + 3, lines_start_y + (fl_height() * (i - 1)) + fl_descent(), fl_width(' ') * line_end, fl_height());
