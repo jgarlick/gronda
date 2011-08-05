@@ -153,8 +153,10 @@ void cmd_pw (int argc, char *argv[])
 		if (mover->str != NULL)
 			fputs (mover->str->data, f);
 
-		fputc ('\n', f);
 		mover = mover->next;
+
+		if (mover != e->cpad->line_head)
+			fputc ('\n', f);
 	}
 
 	fclose (f);
