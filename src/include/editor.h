@@ -180,6 +180,7 @@ void    editor_setup (int, char **);
 pad_t *pad_new(void);
 void pad_set_viewport_size(pad_t *, int, int);
 char pad_get_char_at (pad_t *p, int y, int x);
+void    pad_modified (pad_t *pad);
 
 /* signals.c */
 void    sig_init (void);
@@ -214,7 +215,6 @@ int     get_string_pos (int x, char *str, int *intab);
 int     get_curs_pos (int x, line_t *l);
 void    cursor_set_pos (pad_t *p, int curs_y, int curs_x, int adjust);
 void	get_string_for_viewport(char *in_str, int intab, int width, char *out_str);
-void    pad_modified (pad_t *pad);
 
 /* cmd_buffer.c */
 void cmd_dr   (int argc, char *argv[]);

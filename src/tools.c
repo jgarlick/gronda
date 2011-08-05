@@ -430,14 +430,3 @@ void get_string_for_viewport(char *in_str, int intab, int width, char *out_str) 
 	}
 	*ptr = '\0';
 }
-
-void pad_modified (pad_t *pad)
-{
-	if (!(pad->flags & MODIFIED))
-	{
-		pad->flags |= MODIFIED;
-		e->redraw |= STATS;
-	}
-}
-
-

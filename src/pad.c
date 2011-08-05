@@ -105,3 +105,11 @@ char pad_get_char_at (pad_t *p, int x, int y)
 	return r;
 }
 
+void pad_modified (pad_t *pad)
+{
+	if (!(pad->flags & MODIFIED))
+	{
+		pad->flags |= MODIFIED;
+		e->redraw |= STATS;
+	}
+}
