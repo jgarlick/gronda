@@ -57,8 +57,10 @@ protected:
 
 	void draw() {
 		char buf[80];
+		char line_buffer[512];
+		char *line_ptr;
 		int yp;
-		int i;
+		int i, j;
 		line_t *line;
 		char *str;
 		int line_end, end;
@@ -156,6 +158,9 @@ protected:
 			else
 			{
 				offset = get_string_pos (pad->offset_x + 1, line->str->data, &intab);
+				if (intab)     // if we are in a tab the offset will be from the start of the tab
+					offset++;  // but this is not what we want here
+				
 				if ((size_t)offset < strlen (line->str->data))
 					str = line->str->data + offset;
 				else
@@ -187,9 +192,31 @@ protected:
 					fl_rectf(x() + 3, lines_start_y + (fl_height() * (i - 1)) + fl_descent(), fl_width(' ') * end, fl_height());
 				}
 			}
+
+			line_ptr = line_buffer;
+			if (intab > 0)
+				intab = 4 - intab;
+				
+			for (j = 0; j < viewport_w; j++) {
+				if (!intab && *str == '\t') {
+					intab = 4;
+					str++;
+				}
+				if (intab) {
+					*line_ptr = ' ';
+					line_ptr++;
+					intab--;
+				} else if (*str) {
+					*line_ptr = *str;
+					line_ptr++;
+					str++;
+				}
+			}
+			*line_ptr = '\0';
 			
 			fl_color(text_color);
-			fl_draw(str, x() + 3, yp);
+			fl_draw(line_buffer, x() + 3, yp);
+			
 			yp += fl_height();
 			
 			if (line != pad->line_head)
