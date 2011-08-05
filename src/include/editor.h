@@ -116,25 +116,15 @@ typedef struct input_s
 }
 input_t;
 
-/* TODO: This should be a normal pad (need local key defs first) */
-typedef struct output_msg_s
-{
-	char   *message;
-
-	struct output_msg_s *next;
-
-}
-output_msg_t;
-
 /* main editor struct */
 typedef struct editor_s
 {
 	occupied_window_t occupied_window;
-	output_msg_t *messages;
 
 	input_t *input;				/* command window */
 
 	pad_t *input_pad;
+	pad_t *output_pad;
 
 	buffer_t *buffer_head;      /* paste buffers */
 

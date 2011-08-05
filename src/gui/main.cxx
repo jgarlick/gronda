@@ -333,6 +333,7 @@ class OutputViewport : public Fl_Widget {
 protected:
 	void draw() {
 		char buf[80];
+		line_t *line;
 		
 		fl_font(font, font_size);
 		
@@ -340,8 +341,13 @@ protected:
 		fl_rectf(x(), y(), w(), h() );
 		fl_color(line_color);
 		fl_rect(x(), y(), w(), h() );
-		fl_color(text_color);
-//		fl_draw(buffer, x() + 3, y() + 4 + fl_height() - fl_descent());
+		
+		line  = e->output_pad->line_head->prev;
+		
+		if (line->str && line->str->data) {
+			fl_color(text_color);
+			fl_draw(line->str->data, x() + 3, y() + 4 + fl_height() - fl_descent());
+		}
 	}
 public:
     OutputViewport(int X, int Y, int W, int H, const char *l=0)

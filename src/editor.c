@@ -34,7 +34,8 @@ void editor_init ()
 	e->pad_head = pad_new();
 	e->cpad = e->cepad = e->pad_head;
 	
-	e->input_pad = pad_new();
+	e->input_pad  = pad_new();
+	e->output_pad = pad_new();
 
 	/* temporary until terminal interface uses a pad for the input window */
 	e->input = ALLOC (input_t);

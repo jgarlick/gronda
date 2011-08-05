@@ -195,13 +195,15 @@ void redraw_command ()
 void redraw_output ()
 {
 	int     width;
+	line_t  *line;
 
 	width = (dimensions.ts_cols / 2) - 2;
+	line  = e->output_pad->line_head->prev;
 
 	attron (A_REVERSE);
-	if (e->messages)
+	if (line->str && line->str->data)
 		mvprintw (dimensions.ts_lines - 1, dimensions.ts_cols / 2, "| %-*.*s",
-				  width, width, e->messages->message);
+				  width, width, line->str->data);
 	else
 		mvprintw (dimensions.ts_lines - 1, dimensions.ts_cols / 2, "| %-*.*s",
 				  width, width, "");

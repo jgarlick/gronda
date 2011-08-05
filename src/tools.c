@@ -69,25 +69,20 @@ void parse (const char *format, ...)
 	}
 }
 
-void output_message (char *str, ...)
+void output_message (char *format, ...)
 {
-	output_msg_t *new;
+	char *buf;
 
 	va_list argp;
 
-	new = ALLOC (output_msg_t);
-
-	va_start (argp, str);
-
-	vasprintf (&(new->message), str, argp);
-
-	new->next = e->messages;
-	e->messages = new;
-
-	e->redraw |= OUTPUT;
-	debug ("OUTPUT %s", new->message);
-
+	va_start (argp, format);
+	vasprintf (&buf, format, argp);
 	va_end (argp);
+
+	LINE_append(e->output_pad, buf);
+	e->redraw |= OUTPUT;
+
+	free(buf);
 }
 
 void output_message_c (char *title, char *format, ...)
