@@ -4,9 +4,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#ifdef LINUX
 #include <stdlib.h>				/* for calloc, free */
-#endif
 
 #define ALLOC( x ) ( x* ) calloc( 1, sizeof( x ) )
 #define FREE       free

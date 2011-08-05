@@ -4,10 +4,10 @@
 
 BINARY_NAME     = gronda
 EDITOR_NAME     = "Gronda"
-EDITOR_VERSION  = "0.4.0pre1"
+EDITOR_VERSION  = "0.4.0"
 
 CC      = gcc
-CFLAGS  = -ggdb3 -Wall -Isrc/include -DLINUX -DEDITOR_NAME='$(EDITOR_NAME)' -DEDITOR_VERSION='$(EDITOR_VERSION)' -DYY_NO_UNPUT
+CFLAGS  = -ggdb3 -Wall -Isrc/include -DEDITOR_NAME='$(EDITOR_NAME)' -DEDITOR_VERSION='$(EDITOR_VERSION)' -DYY_NO_UNPUT
 
 libcfiles := $(wildcard src/*.c)
 libobjects := $(notdir $(patsubst %.c,%.o,$(libcfiles)))

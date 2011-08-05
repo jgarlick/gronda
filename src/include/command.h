@@ -12,7 +12,7 @@ command_t;
 
 extern command_t *command_ptrs[27];
 void    execute_command (int, char **);
-void    add_command (char *, void (*)());
+void    add_command (const char *, void (*)());
 void    remove_command (char *);
 
 #endif

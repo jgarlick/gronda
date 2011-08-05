@@ -82,7 +82,7 @@ int get_index (char a)
 	return isalpha (a) ? tolower (a) - 'a' : 26;
 }
 
-command_t *find_command (char *name)
+command_t *find_command (const char *name)
 {
 	command_t *mover;
 	int     a;
@@ -142,7 +142,7 @@ void execute_command (int argc, char *argv[])
 		output_message_c (*argv, "Unknown command");
 }
 
-void add_command (char *name, void (*func) ())
+void add_command (const char *name, void (*func) ())
 {
 	command_t *new;
 	int     a;
