@@ -399,6 +399,37 @@ void cursor_set_pos (pad_t *p, int curs_y, int curs_x, int adjust)
 
 }
 
+/* takes the text for a line and converts it into output suitable for the */
+/* viewport by converting tabs into the appropriate number of spaces      */
+/* in_str - the text for the line from the pad x offset onwards           */
+/* intab  - how far we are already inside a tab at this x offset          */
+/* width  - the width of the viewport                                     */
+/* out_str - pre-allocated string for the output                          */
+void get_string_for_viewport(char *in_str, int intab, int width, char *out_str) {
+	char *ptr;
+	int j;
+	
+	ptr = out_str;
+	if (intab > 0)
+		intab = 4 - intab;
+		
+	for (j = 0; j < width; j++) {
+		if (!intab && *in_str == '\t') {
+			intab = 4;
+			in_str++;
+		}
+		if (intab) {
+			*ptr = ' ';
+			ptr++;
+			intab--;
+		} else if (*in_str) {
+			*ptr = *in_str;
+			ptr++;
+			in_str++;
+		}
+	}
+	*ptr = '\0';
+}
 
 void pad_modified (pad_t *pad)
 {

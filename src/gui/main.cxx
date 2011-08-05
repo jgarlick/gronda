@@ -58,9 +58,8 @@ protected:
 	void draw() {
 		char buf[80];
 		char line_buffer[512];
-		char *line_ptr;
 		int yp;
-		int i, j;
+		int i;
 		line_t *line;
 		char *str;
 		int line_end, end;
@@ -193,27 +192,8 @@ protected:
 				}
 			}
 
-			line_ptr = line_buffer;
-			if (intab > 0)
-				intab = 4 - intab;
-				
-			for (j = 0; j < viewport_w; j++) {
-				if (!intab && *str == '\t') {
-					intab = 4;
-					str++;
-				}
-				if (intab) {
-					*line_ptr = ' ';
-					line_ptr++;
-					intab--;
-				} else if (*str) {
-					*line_ptr = *str;
-					line_ptr++;
-					str++;
-				}
-			}
-			*line_ptr = '\0';
-			
+			get_string_for_viewport(str, intab, viewport_w, line_buffer);
+
 			fl_color(text_color);
 			fl_draw(line_buffer, x() + 3, yp);
 			
