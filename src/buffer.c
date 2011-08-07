@@ -150,6 +150,7 @@ void buffer_cutcopy (buffer_t *buf, int cut, int shape, int start_y, int start_x
 	int     len, copied_len;
 	int     start;
 	int     intab;
+	int     modified = 0;
 
 	l = LINE_get_line_at (p, start_y);
 	if (l == NULL)
@@ -201,7 +202,8 @@ void buffer_cutcopy (buffer_t *buf, int cut, int shape, int start_y, int start_x
 					if (a != start_y)
 						LINE_remove (p, l);
 					else
-						string_remove (l->str, start_x - 1, len); 						
+						string_remove (l->str, start_x - 1, len);
+					modified = 1;
 				}
 			}
 			else
@@ -219,6 +221,7 @@ void buffer_cutcopy (buffer_t *buf, int cut, int shape, int start_y, int start_x
 
 						LINE_remove (p, l);
 					}
+					modified = 1;
 				}
 			}
 
@@ -245,11 +248,17 @@ void buffer_cutcopy (buffer_t *buf, int cut, int shape, int start_y, int start_x
 			else
 				string_append (buf->str, "%s", temp);
 
-			if (cut) string_remove (l->str, start_x - 1, len); 
+			if (cut) {
+				string_remove (l->str, start_x - 1, len);
+				modified = 1;
+			}
 		}
 
 		l = next;
 	}
+	
+	if (modified)
+		pad_modified (e->cpad);
 }
 
 void buffer_save (buffer_t *buf, char *file_name)
