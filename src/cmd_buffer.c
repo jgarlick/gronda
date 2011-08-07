@@ -49,7 +49,7 @@ void cmd_xcxdxa (int argc, char *argv[], int cut)
 	int append = 0;
 	char *file_name = "";
 
-	buf_name = "primary";
+	buf_name = "clipboard";
 	for (a = 1; a < argc; a++)
 	{
 		if (argv[a][0] != '-')
@@ -125,7 +125,7 @@ void cmd_xp (int argc, char *argv[])
 
 	char     *file_name = "";
 
-	buf_name         = "default";
+	buf_name         = "clipboard";
 	force_overstrike = 0;
 	shape = REGION_LINEAR;
 

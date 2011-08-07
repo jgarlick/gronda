@@ -13,7 +13,7 @@ extern "C" {
 }
 
 void display_copy(buffer_t *buf) {
-	if (!strcmp(buf->name, "primary")) {
+	if (!strcmp(buf->name, "clipboard")) {
 		Fl::copy(buf->str->data, strlen(buf->str->data), 1);
 	}
 }
@@ -397,11 +397,21 @@ int MyWindow::handle(int e) {
 	keydef_t *keydef;
 	int k, c, mods;
 	int len;
+	buffer_t *paste_buffer;
 
 	if (e == FL_FOCUS) {
+		Fl::paste((Fl_Widget &)*this, 1);
 		return 1;
 	}
 	if (e == FL_ENTER) {
+		return 1;
+	}
+	if (e == FL_PASTE) {
+		paste_buffer = buffer_find((char *)"clipboard");
+		if (paste_buffer) {
+			string_truncate (paste_buffer->str, 0);
+			string_append(paste_buffer->str, (char *)Fl::event_text());
+		}
 		return 1;
 	}
 

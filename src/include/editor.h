@@ -184,6 +184,7 @@ int crash_file_check (char *fname);
 
 /* buffer.c */
 void get_region (int shape, int *start_y, int *start_x, int *end_y, int *end_x);
+buffer_t *buffer_find (char *name);
 buffer_t *buffer_create (char *name);
 void buffer_cutcopy (buffer_t *buf, int cut, int shape, int start_y, int start_x, int end_y, int end_x);
 void buffer_save (buffer_t *buf, char *file_name);

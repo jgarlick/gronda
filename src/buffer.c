@@ -101,7 +101,7 @@ void get_region (int shape, int *start_y, int *start_x, int *end_y, int *end_x)
 
 /* Search for a named paste buffer. */
 /* If the buffer does not exist then try to create it. */
-static buffer_t *buffer_find (char *name)
+buffer_t *buffer_find (char *name)
 {
 	buffer_t *mover;
 
