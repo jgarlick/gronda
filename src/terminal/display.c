@@ -414,6 +414,3 @@ void display_finish_menu ()
 void    display_copy(buffer_t *buf) {
 	/* do nothing */
 }
-void	display_paste(buffer_t *buf) {
-	/* do nothing */
-}

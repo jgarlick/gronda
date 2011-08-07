@@ -18,9 +18,6 @@ void display_copy(buffer_t *buf) {
 	}
 }
 
-void display_paste(buffer_t *buf) {
-}
-
 void display_close ()
 {
 }
