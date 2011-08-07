@@ -189,7 +189,9 @@ void buffer_cutcopy (buffer_t *buf, int cut, int shape, int start_y, int start_x
 
 				s = temp;
 			}
-
+			
+			/* if we are not on the last line, 
+			   or the cursor is past the end of the line and it starts before the end of the line */
 			if (a != end_y || (end_x > (len + 1) && !(a == start_y && start > (len + 1))))
 			{
 				string_append (buf->str, "%s\n", s);
@@ -248,7 +250,6 @@ void buffer_cutcopy (buffer_t *buf, int cut, int shape, int start_y, int start_x
 
 		l = next;
 	}
-	debug("BUFFER::%s::\n", buf->str->data);
 }
 
 void buffer_save (buffer_t *buf, char *file_name)

@@ -410,3 +410,10 @@ void display_finish_menu ()
 	curs_set (1);
 	debug ("Finished menu");
 }
+
+void    display_copy(buffer_t *buf) {
+	/* do nothing */
+}
+void	display_paste(buffer_t *buf) {
+	/* do nothing */
+}

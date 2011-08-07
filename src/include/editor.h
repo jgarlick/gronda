@@ -259,6 +259,8 @@ void cmd_tdm  (int argc, char *argv[]);
 void cmd_wc   (int argc, char *argv[]);
 
 /* required display functions */
+void    display_copy(buffer_t *);
+void	display_paste(buffer_t *);
 void    display_close (void);
 void    display_do_menu (menu_t *);
 void    display_finish_menu ();

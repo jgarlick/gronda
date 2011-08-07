@@ -49,7 +49,7 @@ void cmd_xcxdxa (int argc, char *argv[], int cut)
 	int append = 0;
 	char *file_name = "";
 
-	buf_name = "default";
+	buf_name = "primary";
 	for (a = 1; a < argc; a++)
 	{
 		if (argv[a][0] != '-')
@@ -90,6 +90,8 @@ void cmd_xcxdxa (int argc, char *argv[], int cut)
 		e->cpad->curs_y = start_y - e->cpad->offset_y;
 		e->cpad->curs_x = start_x - e->cpad->offset_x;
 	}
+	
+	display_copy(buf);
 }
 
 void cmd_xc (int argc, char *argv[])

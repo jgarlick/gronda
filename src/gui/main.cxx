@@ -12,6 +12,15 @@ extern "C" {
 #include "../include/editor.h"
 }
 
+void display_copy(buffer_t *buf) {
+	if (!strcmp(buf->name, "primary")) {
+		Fl::copy(buf->str->data, strlen(buf->str->data), 1);
+	}
+}
+
+void display_paste(buffer_t *buf) {
+}
+
 void display_close ()
 {
 }
