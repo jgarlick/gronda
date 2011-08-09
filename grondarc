@@ -36,8 +36,9 @@ kd M1U xc ke
 kd M1S 'sic;dr;echo -r' ke
 kd M1SU 'xc -r' ke
 
+kd ^d ed ke
+
 kd ^s pw ke
 kd ^q wc ke
 
 showtabs -off
-
