@@ -88,19 +88,12 @@ char pad_get_char_at (pad_t *p, int x, int y)
 	}
 
 	offset_l = x - a - 1;
-	debug ("    OFFSET IS: %d", offset_l);
 
 	if (offset_l != 0)
 	{
 		offset_l += width;
 		offset_r = width - offset_l;
 	}
-
-
-	debug ("    OFFSET_L IS: %d", offset_l);
-	debug ("    OFFSET_R IS: %d", offset_r);
-	debug ("VALUE OF X IS: %d", x);
-	debug ("VALUE OF R IS: '%c'", r);
 
 	return r;
 }
