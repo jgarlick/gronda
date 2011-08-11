@@ -4,15 +4,16 @@
 	#include <string.h>
 	#include "editor.h"
 
-	int buffersize = 16;
-	int bufferinc = 32;
-	char *buffer;
-	char *s;
+	string_t *buf;
+	char def_name[64];
+	char *ptr;
+	char *ptr2;
 
-	char *quote;
+	char quote_delimiter;
 
 	char *vargs[32];
 	int i = 0;
+	
 %}
 
 ws         [[:blank:]]+
@@ -30,163 +31,117 @@ quote		[\'\"]
 range		^(\{{optws}{uint}?{optws}\,{optws}{uint}?{optws}\})
 
 %x STRING
+%x DEF
 
 %%
 
+kd{ws}{word}{ws} { 
+	BEGIN DEF;
+	
+	/* get the def name */
+	ptr = yytext + 2;
+	while(*ptr == ' ') ptr++;
+	ptr2 = def_name;
+	while(*ptr != ' ') {
+		*ptr2++ = *ptr++;
+	}
+	*ptr2 = '\0';
+	
+	buf = string_alloc("");
+}
+<DEF>{ws}ke {
+	vargs[0] = "kd";
+	vargs[1] = def_name;
+	vargs[2] = buf->data;
+	vargs[3] = "ke";
+	execute_command(4, vargs);
+	
+	BEGIN 0;
+	def_name[0] = '\0';
+	string_free(buf);
+}
+<DEF>. {
+	string_append(buf, "%c", *yytext);
+}
+<DEF><<EOF>> {
+	BEGIN 0;
+	string_free(buf);
+}
+
 {quote}		{
 			BEGIN STRING;
-			buffer = malloc(buffersize * sizeof(char *));
-			s = buffer;
-			quote = strdup(yytext);
+			buf = string_alloc("");
+			quote_delimiter = *yytext;
 		}
 <STRING>\\n	{
-			int str_len = s - buffer;	/* because there's no 0-terminator yet */
-			if (str_len >= buffersize)
-			{
-				buffer = realloc(buffer, buffersize + bufferinc);
-				buffersize += bufferinc;
-				s = buffer + str_len;
-			}
-			*s++ = '\n';
+			string_append(buf, "\n");
 		}
 <STRING>\\t	{
-			int str_len = s - buffer;	/* because there's no 0-terminator yet */
-			if (str_len >= buffersize)
-			{
-				buffer = realloc(buffer, buffersize + bufferinc);
-				buffersize += bufferinc;
-				s = buffer + str_len;
-			}
-			*s++ = '\t';
+			string_append(buf, "\t");
 		}
 <STRING>\\\'	{
-			int str_len = s - buffer;	/* because there's no 0-terminator yet */
-			if (str_len >= buffersize)
-			{
-				buffer = realloc(buffer, buffersize + bufferinc);
-				buffersize += bufferinc;
-				s = buffer + str_len;
-			}
-			*s++ = '\'';
+			string_append(buf, "\'");
 		}
 <STRING>\\\"	{
-			int str_len = s - buffer;	/* because there's no 0-terminator yet */
-			if (str_len >= buffersize)
-			{
-				buffer = realloc(buffer, buffersize + bufferinc);
-				buffersize += bufferinc;
-				s = buffer + str_len;
-			}
-			*s++ = '\"';
+			string_append(buf, "\"");
 		}
 <STRING>{quote}	{
-			int str_len = s - buffer;	/* because there's still no 0-terminator */
-
-			if (strcmp(yytext, quote) == 0)
+			if (*yytext == quote_delimiter)
 			{
-				*s = 0;
 				BEGIN 0; /* Back into normal parse mode. */
-				debug(" [lex] Found string %s! Spanging it to vargs.", buffer);
+				debug(" [lex] Found string %s! Adding to vargs.", buf->data);
 				if (i < 32)
-				{
-					vargs[i++] = strdup(buffer);
-				}
+					vargs[i++] = strdup(buf->data);
 				else
-				{
 					debug(" [lex] Out of tokens.");
-				}
-				free (buffer);
-				free (quote);
+				string_free(buf);
 			}
 			else
-			{
-				if (str_len >= buffersize)
-				{
-					buffer = realloc(buffer, buffersize + bufferinc);
-					buffersize += bufferinc;
-					s = buffer + str_len;
-				}
-				*s++ = *yytext;
-			}
+				string_append(buf, "%c", *yytext);
 		}
 <STRING><<EOF>>	{	debug(" [lex] Quotes don't match.");
 			BEGIN 0;
-			free (buffer);
+			string_free(buf);
 		}
 <STRING>\n	{	debug(" [lex] Quotes don't match.");
 			BEGIN 0;
-			free (buffer);
+			string_free(buf);
 		}
 <STRING>.	{
-			int str_len = s - buffer;	/* because there's still no 0-terminator */
-			if (str_len >= buffersize)
-			{
-				buffer = realloc(buffer, buffersize + bufferinc);
-				buffersize += bufferinc;
-				s = buffer + str_len;
-			}
-			*s++ = *yytext;
+			string_append(buf, "%c", *yytext);
 		}
 
 {ws}		;
 
-{word}	{	if (i < 32)
-			{
-				vargs[i++] = strdup(yytext);
-			}
-			else
-			{
-				debug(" [lex] Out of tokens.");
-			}
+{word}	{	
+			if (i < 32) vargs[i++] = strdup(yytext);
 		}
 
-{number}	{	if (i < 32)
-			{
-				vargs[i++] = strdup(yytext);
-			}
-			else
-			{
-				debug(" [lex] Out of tokens.");
-			}
+{number} {	
+			if (i < 32) vargs[i++] = strdup(yytext);
 		}
 
 <<EOF>>		{
 			int j;
 			if (i != 0)
 			{
-				debug(" [lex] Calling execute_command...");
 				execute_command(i, vargs);
-				debug(" [lex] Freeing allocated tokens...");
+
 				for (j = 0; j < i; j++)
-				{
-					debug(" [lex] Token %d : %s", j, vargs[j]);
 					free(vargs[j]);
-				}
 			}
-			else
-			{
-				debug(" [lex] Nothing to do!");
-			}
+
 			i = 0;
-			debug(" [lex] Done.");
 			yyterminate();
 		}
 {delimiter}	{
 			int j;
 			if (i != 0)
 			{
-				debug(" [lex] Calling execute_command...");
 				execute_command(i, vargs);
-				debug(" [lex] Freeing allocated tokens...");
+
 				for (j = 0; j < i; j++)
-				{
-					debug(" [lex] Token %d : %s", j, vargs[j]);
 					free(vargs[j]);
-				}
-			}
-			else
-			{
-				debug(" [lex] Empty command.");
 			}
 			i = 0;
 		}

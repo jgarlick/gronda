@@ -19,16 +19,13 @@
 
 void cmd_kd (int argc, char *argv[])
 {
-	if (strcmp (argv[argc - 1], "ke"))
+	if (argc != 4 || strcmp (argv[3], "ke"))
 	{
 		output_message_c (argv[0], "Missing ke");
 
 		return;
 	}
 
-	/* TODO - concatenate remaining args up to ke */
-
 	KEY_define (argv[1], argv[2]);
 }
-
 
