@@ -204,6 +204,7 @@ void    create_local_config ();
 int     get_string_pos (int x, char *str, int *intab);
 int     get_curs_pos (int x, line_t *l);
 void    cursor_set_pos (pad_t *p, int curs_y, int curs_x, int adjust);
+void 	move_cursor_into_view(pad_t *pad);
 void	get_string_for_viewport(char *in_str, int intab, int width, char *out_str);
 
 /* cmd_buffer.c */
@@ -222,11 +223,11 @@ void cmd_au   (int argc, char *argv[]);
 void cmd_ad   (int argc, char *argv[]);
 void cmd_al   (int argc, char *argv[]);
 void cmd_ar   (int argc, char *argv[]);
-
 void cmd_tt   (int argc, char *argv[]);
 void cmd_tb   (int argc, char *argv[]);
 void cmd_tl   (int argc, char *argv[]);
 void cmd_tr   (int argc, char *argv[]);
+void cmd_goto (int argc, char *argv[]);
 
 /* cmd_file.c */
 void cmd_ce   (int argc, char *argv[]);

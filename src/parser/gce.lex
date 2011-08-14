@@ -2,18 +2,21 @@
 	#include <stdarg.h>
 	#include <stdio.h>
 	#include <string.h>
+	#include <ctype.h>
 	#include "editor.h"
 
 	string_t *buf;
-	char def_name[64];
+	char token_buf[64];
 	char *ptr;
 	char *ptr2;
+
+	string_t *word;
 
 	char quote_delimiter;
 
 	char *vargs[32];
 	int i = 0;
-	
+
 %}
 
 ws         [[:blank:]]+
@@ -22,26 +25,31 @@ digit		[0-9]
 number		[+-]?{digit}*"."?{digit}+
 uint		{digit}+
 
-punct		[\\\-[\]\.\,/<>?:|{}!@#$%^&*()_`~]
+punct		[\\\-\.\,/<>?:|{}!@#$%^&*()_`~]
 word		([[:alpha:]]|{punct})([[:alnum:]]|{punct})*
-
+/*
+k_punct		[\\\-[\]\.\,/<>?:|{}!@#$%^&*()_`~]
+keyname		([[:alpha:]]|{k_punct})([[:alnum:]]|{k_punct})*
+*/
 delimiter	[;]
 quote		[\'\"]
 
-range		^(\{{optws}{uint}?{optws}\,{optws}{uint}?{optws}\})
+/*range		^(\{{optws}{uint}?{optws}\,{optws}{uint}?{optws}\})*/
 
 %x STRING
 %x DEF
 
 %%
-
-kd{ws}{word}{ws} { 
+	word = string_alloc("");
+	
+kd{ws}[^[:blank:]]+{ws} { 
+	debug("found kd");
 	BEGIN DEF;
 	
 	/* get the def name */
 	ptr = yytext + 2;
 	while(*ptr == ' ') ptr++;
-	ptr2 = def_name;
+	ptr2 = token_buf;
 	while(*ptr != ' ') {
 		*ptr2++ = *ptr++;
 	}
@@ -51,13 +59,13 @@ kd{ws}{word}{ws} {
 }
 <DEF>{ws}ke {
 	vargs[0] = "kd";
-	vargs[1] = def_name;
+	vargs[1] = token_buf;
 	vargs[2] = buf->data;
 	vargs[3] = "ke";
 	execute_command(4, vargs);
 	
 	BEGIN 0;
-	def_name[0] = '\0';
+	token_buf[0] = '\0';
 	string_free(buf);
 }
 <DEF>. {
@@ -111,15 +119,41 @@ kd{ws}{word}{ws} {
 			string_append(buf, "%c", *yytext);
 		}
 
-{ws}		;
+{ws}	{
+	if (strlen(word->data) > 0 && i < 32) {
+		vargs[i++] = strdup(word->data);
+		string_truncate(word, 0);
+	}
+}
 
-{word}	{	
-			if (i < 32) vargs[i++] = strdup(yytext);
-		}
+"["[+\-0-9]*[,][+\-0-9]*"]" {
+	ptr = yytext + 1;
+	ptr2 = token_buf;
+	while(isdigit(*ptr) || *ptr == '+' || *ptr == '-')
+		*ptr2++ = *ptr++;
+	ptr++;
+	*ptr2++ = '\0';
+	while(isdigit(*ptr) || *ptr == '+' || *ptr == '-')
+		*ptr2++ = *ptr++;
+	*ptr2 = '\0';
+	
+	debug("found goto :%s:%s:", token_buf, token_buf + strlen(token_buf) + 1);
+	vargs[0] = "[";
+	vargs[1] = token_buf;
+	vargs[2] = token_buf + strlen(token_buf) + 1;
+	execute_command(3, vargs);
+	
+}
 
-{number} {	
-			if (i < 32) vargs[i++] = strdup(yytext);
-		}
+{word} {
+       debug("found word %s", yytext);
+		if (i < 32) vargs[i++] = strdup(yytext);
+	}
+{number} {
+	debug("found num %s", yytext);
+		if (i < 32) vargs[i++] = strdup(yytext);
+	}
+
 
 <<EOF>>		{
 			int j;
@@ -134,7 +168,7 @@ kd{ws}{word}{ws} {
 			i = 0;
 			yyterminate();
 		}
-{delimiter}	{
+{delimiter}|\n	{
 			int j;
 			if (i != 0)
 			{
@@ -146,11 +180,11 @@ kd{ws}{word}{ws} {
 			i = 0;
 		}
 .		{
-			debug (" [lex] *** Unexpected punctuation! Fix this! ***\n");
+		debug (" [lex] *** Unexpected character! ***\n");
 		}
 
 %%
-
+	
 int yywrap(void)
 {
 	return 1;

@@ -381,6 +381,24 @@ void cursor_set_pos (pad_t *p, int curs_y, int curs_x, int adjust)
 
 }
 
+void move_cursor_into_view(pad_t *pad) {
+	if (pad->curs_y < 1) {
+		pad->offset_y += (pad->curs_y - 1);
+		pad->curs_y = 1;
+	} else if (pad->curs_y > pad->height) {
+		pad->offset_y += (pad->curs_y - pad->height);
+		pad->curs_y = pad->height;
+	}
+
+	if (pad->curs_x < 1) {
+		pad->offset_x += (pad->curs_x - 1);
+		pad->curs_x = 1;
+	} else if (pad->curs_x > pad->width) {
+		pad->offset_x += (pad->curs_x - pad->width);
+		pad->curs_x = pad->width;
+	}
+}
+
 /* takes the text for a line and converts it into output suitable for the */
 /* viewport by converting tabs into the appropriate number of spaces      */
 /* in_str - the text for the line from the pad x offset onwards           */

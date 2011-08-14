@@ -39,6 +39,8 @@ void add_base_commands ()
 	add_command ("tb",   cmd_tb);
 	add_command ("tl",   cmd_tl);
 	add_command ("tr",   cmd_tr);
+	
+	add_command ("[", cmd_goto);
 
 	/* file */
 	add_command ("ce",   cmd_ce);
