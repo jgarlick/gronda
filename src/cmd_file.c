@@ -119,8 +119,8 @@ void cmd_ce (int argc, char *argv[])
 
 	e->cpad->curs_x   = 1;
 	e->cpad->curs_y   = 1;
+	e->cpad->offset_x = 0;
 	e->cpad->offset_y = 0;
-	e->cpad->flags    = 0;
 	e->cpad->flags    = 0;
 
 	/* set the read/write / read only mode */
