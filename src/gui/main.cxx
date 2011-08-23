@@ -426,7 +426,9 @@ int MyWindow::handle(int e) {
 
 		if (k > 0 && k < 256) {
 			if (mods == FL_SHIFT) // shift only, no other modifiers
+				debug("PARADOX1 %d", k);
 				k = Fl::event_text()[0]; // text for the key, handles shift+standard keypress
+				debug("PARADOX2 %d", k);
 
 			if (k == '\'') {
 				sprintf(buffer, "squote");
