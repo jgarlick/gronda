@@ -391,22 +391,23 @@ struct keycode_table{int n; const char* text;} table[] = {
 //  {FL_KP_Enter, "FL_KP_Enter"}
 };
 
-int MyWindow::handle(int e) {
+int MyWindow::handle(int event) {
 	char buffer1[100];
 	char *buffer;
 	keydef_t *keydef;
 	int k, c, mods;
 	int len;
 	buffer_t *paste_buffer;
+	int x, y, old_x, old_y;
 
-	if (e == FL_FOCUS) {
+	if (event == FL_FOCUS) {
 		Fl::paste((Fl_Widget &)*this, 1);
 		return 1;
 	}
-	if (e == FL_ENTER) {
+	if (event == FL_ENTER) {
 		return 1;
 	}
-	if (e == FL_PASTE) {
+	if (event == FL_PASTE) {
 		paste_buffer = buffer_find((char *)"clipboard");
 		if (paste_buffer) {
 			string_truncate (paste_buffer->str, 0);
@@ -421,14 +422,12 @@ int MyWindow::handle(int e) {
 	buffer[0] = '\0';
 	mods = Fl::event_state();
 	
-	if (e == FL_KEYDOWN || e == FL_KEYUP) {
+	if (event== FL_KEYDOWN || event== FL_KEYUP) {
 	    k = Fl::event_key();
 
 		if (k > 0 && k < 256) {
 			if (mods == FL_SHIFT) // shift only, no other modifiers
-				debug("PARADOX1 %d", k);
 				k = Fl::event_text()[0]; // text for the key, handles shift+standard keypress
-				debug("PARADOX2 %d", k);
 
 			if (k == '\'') {
 				sprintf(buffer, "squote");
@@ -447,22 +446,28 @@ int MyWindow::handle(int e) {
 	      for (int i = 0; i < int(sizeof(table)/sizeof(*table)); i++)
 			if (table[i].n == k) { strcpy(buffer, table[i].text); break;}
 		}
-	} else if (e == FL_PUSH || e == FL_RELEASE) {
+	} else if (event== FL_PUSH || event== FL_RELEASE) {
 		sprintf(buffer, "M%d", Fl::event_button());
 	}
 
-	if (e == FL_MOVE || e == FL_DRAG) {
+	if (event== FL_MOVE || event== FL_DRAG) {
+		x = Fl::event_x();
+		y = Fl::event_y();
+		old_x = e->cpad->curs_x;
+		old_y = e->cpad->curs_y;
 		if (mouse_to_cursor)
-			edit_viewport->move_cursor(Fl::event_x(), Fl::event_y());
-		set_mouse_cursor(Fl::event_x(), Fl::event_y());
-		edit_viewport->redraw();
+			edit_viewport->move_cursor(x, y);
+		set_mouse_cursor(x, y);
+
+		if(!edit_viewport->in_edit_window(x, y) || (e->cpad->curs_x != old_x) || (e->cpad->curs_y != old_y))
+			edit_viewport->redraw();
 	}
 
 	len = strlen(buffer);
 	if (len > 0) {
 		// don't add S to regular keys e.g. shift+a, but add them when another modifier key
 		// is also pressed e.g. shift+ctrl+a generates ^aS
-		if ((mods & FL_SHIFT) && (e == FL_PUSH || e == FL_RELEASE || k > 255 || mods != FL_SHIFT)) {
+		if ((mods & FL_SHIFT) && (event== FL_PUSH || event== FL_RELEASE || k > 255 || mods != FL_SHIFT)) {
 			buffer[len]     = 'S';
 			buffer[len + 1] = '\0';
 		}
@@ -479,7 +484,7 @@ int MyWindow::handle(int e) {
 			*buffer = '^';
 		}
 
-		if (e == FL_RELEASE || e == FL_KEYUP) {
+		if (event== FL_RELEASE || event== FL_KEYUP) {
 			len = strlen(buffer);
 			buffer[len]     = 'U';
 			buffer[len + 1] = '\0';
