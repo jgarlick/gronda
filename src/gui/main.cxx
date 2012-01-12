@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include <FL/Fl.H>
-#include <FL/Fl_Window.H>
+#include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Box.H>
 
@@ -258,7 +258,7 @@ public:
 EditViewport   *edit_viewport;
 
 
-class MyWindow : public Fl_Window {
+class MyWindow : public Fl_Double_Window {
 	int handle(int);
 
 	void set_mouse_cursor(int X, int Y) {
@@ -271,7 +271,7 @@ class MyWindow : public Fl_Window {
 
 public:
 	MyWindow(int w, int h, const char *t=0L) 
-		: Fl_Window( w, h, t ) { }
+		: Fl_Double_Window( w, h, t ) { }
 };
 
 class InputViewport : public Fl_Widget {
@@ -538,6 +538,8 @@ int main(int argc, char **argv) {
 	bg_color    = fl_rgb_color(254, 255, 231);
 	line_color  = fl_rgb_color(71, 43, 198);
 	text_color  = fl_rgb_color(0, 0, 0);
+
+	Fl::visual(FL_DOUBLE|FL_INDEX);
 
 	window = new MyWindow(640,480);
 
