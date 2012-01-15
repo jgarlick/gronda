@@ -39,8 +39,7 @@ void get_region (int shape, int *start_y, int *start_x, int *end_y, int *end_x)
 			l = p->line_head;
 
 		*end_y = *start_y;
-//		*end_x = strlen (l->str->data) + 1;
-		*end_x = get_curs_pos (strlen (l->str->data), l) + 1;
+		*end_x = get_curs_pos (l->str ? strlen (l->str->data) : 0, l) + 1;
 	}
 	else if (shape == REGION_LINEAR)
 	{
