@@ -25,12 +25,9 @@ digit		[0-9]
 number		[+-]?{digit}*"."?{digit}+
 uint		{digit}+
 
-punct		[\\\-\.\,/<>?:|{}!@#$%^&*()_`~]
-word		([[:alpha:]]|{punct})([[:alnum:]]|{punct})*
-/*
-k_punct		[\\\-[\]\.\,/<>?:|{}!@#$%^&*()_`~]
-keyname		([[:alpha:]]|{k_punct})([[:alnum:]]|{k_punct})*
-*/
+punct		[\\\-\.\,<>?/:|{}!@#$%^&*()_`~]
+word		([[:alpha:]]|[\-\.\,<>:|@#%^*()_`~])([[:alnum:]]|{punct})*
+
 delimiter	[;]
 quote		[\'\"]
 
@@ -43,7 +40,6 @@ quote		[\'\"]
 	word = string_alloc("");
 	
 kd{ws}[^[:blank:]]+{ws} { 
-	debug("found kd");
 	BEGIN DEF;
 	
 	/* get the def name */
@@ -97,7 +93,6 @@ kd{ws}[^[:blank:]]+{ws} {
 			if (*yytext == quote_delimiter)
 			{
 				BEGIN 0; /* Back into normal parse mode. */
-				debug(" [lex] Found string %s! Adding to vargs.", buf->data);
 				if (i < 32)
 					vargs[i++] = strdup(buf->data);
 				else
@@ -143,6 +138,13 @@ kd{ws}[^[:blank:]]+{ws} {
 	vargs[2] = token_buf + strlen(token_buf) + 1;
 	execute_command(3, vargs);
 	
+}
+
+[!$/\\?&=] {
+	token_buf[0] = *yytext;
+	token_buf[1] = '\0';
+	vargs[0] = strdup(token_buf);
+	i = 1;
 }
 
 {word} {
