@@ -63,6 +63,9 @@ void add_base_commands ()
 	add_command ("ed",   cmd_ed);
 	add_command ("ei",   cmd_ei);
 
+	/* search */
+	add_command("/", cmd_search);
+
 	/* system */
 	add_command ("!",    cmd_bang);
 

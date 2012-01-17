@@ -106,3 +106,11 @@ void pad_modified (pad_t *pad)
 		e->redraw |= STATS;
 	}
 }
+
+int pad_pos_x(pad_t *pad) {
+	return pad->curs_x + pad->offset_x;
+}
+
+int pad_pos_y(pad_t *pad) {
+	return pad->curs_y + pad->offset_y;
+}

@@ -168,7 +168,9 @@ void    editor_setup (int, char **);
 pad_t *pad_new(void);
 void pad_set_viewport_size(pad_t *, int, int);
 char pad_get_char_at (pad_t *p, int y, int x);
-void    pad_modified (pad_t *pad);
+void pad_modified (pad_t *pad);
+int  pad_pos_x(pad_t *pad);
+int  pad_pos_y(pad_t *pad);
 
 /* signals.c */
 void    sig_init (void);
@@ -255,6 +257,9 @@ void cmd_en   (int argc, char *argv[]);
 void cmd_ee   (int argc, char *argv[]);
 void cmd_ed   (int argc, char *argv[]);
 void cmd_ei   (int argc, char *argv[]);
+
+/* cmd_search.c */
+void cmd_search (int argc, char *argv[]);
 
 /* cmd_window.c */
 void cmd_tdm  (int argc, char *argv[]);

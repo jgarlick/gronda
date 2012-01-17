@@ -35,6 +35,7 @@ quote		[\'\"]
 
 %x STRING
 %x DEF
+%x SEARCH
 
 %%
 	word = string_alloc("");
@@ -140,7 +141,56 @@ kd{ws}[^[:blank:]]+{ws} {
 	
 }
 
-[!$/\\?&=] {
+[/\\] {
+	BEGIN SEARCH;
+
+	buf = string_alloc("");
+	quote_delimiter = *yytext;
+	debug("SEARCH start %c", quote_delimiter);
+}
+
+<SEARCH>[\\][\\/] {
+	debug("SEARCH escaped slash");
+	string_append(buf, "%c", *yytext);
+}
+
+<SEARCH>[/\\] {
+	if (*yytext == quote_delimiter)
+	{
+		debug("SEARCH delim");
+		token_buf[0] = quote_delimiter;
+		token_buf[1] = '\0';
+		vargs[0] = token_buf;
+		vargs[1] = buf->data;
+		execute_command(2, vargs);
+
+		BEGIN 0;
+		string_free(buf);
+	}
+	else {
+		debug("SEARCH escaped slash non delimiting");
+		string_append(buf, "%c", *yytext);
+	}
+
+}
+<SEARCH>. {
+	debug("SEARCH char %c", *yytext);
+	string_append(buf, "%c", *yytext);
+}
+
+<SEARCH><<EOF>> {
+	debug("SEARCH eof");
+	token_buf[0] = quote_delimiter;
+	token_buf[1] = '\0';
+	vargs[0] = token_buf;
+	vargs[1] = buf->data;
+	execute_command(2, vargs);
+
+	BEGIN 0;
+	string_free(buf);
+}
+
+[!$\\?&=] {
 	token_buf[0] = *yytext;
 	token_buf[1] = '\0';
 	vargs[0] = strdup(token_buf);
