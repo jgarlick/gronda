@@ -300,6 +300,7 @@ int get_string_pos (int x, char *str, int *intab)
 
 /* get the horizontal cursor position for the given string */
 /* position on a line, accounting for tabs etc             */
+/* TODO: why doesn't this use get_string_pos? */
 int get_curs_pos (int x, line_t *l)
 {
 	int  len;

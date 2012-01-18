@@ -53,8 +53,10 @@ void cmd_search (int argc, char *argv[])
 			r = regexec(&regex, ptr, 10, matchptr, 0);
 		}
 		if (!r) {
-			cursor_set_pos (pad, y, matchptr[0].rm_so + start_x + 1, ADJUST_RIGHT);
-			move_cursor_into_view(e->cpad);
+			pad->curs_x = get_curs_pos(matchptr[0].rm_so + start_x, l) - pad->offset_x;
+			pad->curs_y = y - pad->offset_y;
+			move_cursor_into_view(pad);
+			output_message("");
 		} else if(r != REG_NOMATCH) {
 			output_message("error");
 		}
