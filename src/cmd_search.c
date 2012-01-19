@@ -21,6 +21,7 @@ void cmd_search (int argc, char *argv[])
 	pad_t  *pad = e->cpad;
 	line_t *l;
 	regmatch_t matchptr[10];
+	int flags;
 	int r;
 	int start_x, y, intab;
 	char *ptr;
@@ -55,7 +56,12 @@ void cmd_search (int argc, char *argv[])
 //				debug("searching from %s", ptr);
 			}
 //			debug("match string = %s", ptr);
-			r = regexec(&(pad->search), ptr, 10, matchptr, 0);
+			if(start_x > 0)
+				flags = REG_NOTBOL;
+			else
+				flags = 0;
+			
+			r = regexec(&(pad->search), ptr, 10, matchptr, flags);
 		}
 		if (!r) {
 			pad->curs_x = get_curs_pos(matchptr[0].rm_so + start_x, l) - pad->offset_x;
