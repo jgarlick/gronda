@@ -17,6 +17,25 @@
 	char *vargs[32];
 	int i = 0;
 
+	void execute_search() {
+		token_buf[0] = quote_delimiter;
+		token_buf[1] = '\0';
+		vargs[0] = token_buf;
+
+		if(string_length(buf) > 0) {
+			vargs[1] = buf->data;
+			i = 2;
+		} else {
+			vargs[1] = NULL;
+			i = 1;
+		}
+		execute_command(i, vargs);
+
+		BEGIN 0;
+		i = 0;
+		string_free(buf);
+	}
+
 %}
 
 ws         [[:blank:]]+
@@ -150,44 +169,21 @@ kd{ws}[^[:blank:]]+{ws} {
 }
 
 <SEARCH>[\\][\\/] {
-	debug("SEARCH escaped slash");
 	string_append(buf, "%c", *yytext);
 }
 
 <SEARCH>[/\\] {
 	if (*yytext == quote_delimiter)
-	{
-		debug("SEARCH delim");
-		token_buf[0] = quote_delimiter;
-		token_buf[1] = '\0';
-		vargs[0] = token_buf;
-		vargs[1] = buf->data;
-		execute_command(2, vargs);
-
-		BEGIN 0;
-		string_free(buf);
-	}
-	else {
-		debug("SEARCH escaped slash non delimiting");
+		execute_search();
+	else
 		string_append(buf, "%c", *yytext);
-	}
-
 }
 <SEARCH>. {
-	debug("SEARCH char %c", *yytext);
 	string_append(buf, "%c", *yytext);
 }
 
 <SEARCH><<EOF>> {
-	debug("SEARCH eof");
-	token_buf[0] = quote_delimiter;
-	token_buf[1] = '\0';
-	vargs[0] = token_buf;
-	vargs[1] = buf->data;
-	execute_command(2, vargs);
-
-	BEGIN 0;
-	string_free(buf);
+	execute_search();
 }
 
 [!$\\?&=] {

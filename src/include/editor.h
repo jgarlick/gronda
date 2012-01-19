@@ -6,6 +6,9 @@
 
 #include <stdlib.h>				/* for calloc, free */
 
+#include <sys/types.h>
+#include <regex.h>
+
 #define ALLOC( x ) ( x* ) calloc( 1, sizeof( x ) )
 #define FREE       free
 
@@ -93,6 +96,8 @@ typedef struct pad_s
 	int    *line_redraw;		/* redraw for each line */
 
 	line_t *line_head;
+
+	regex_t search;
 
 	struct pad_s *next;
 }

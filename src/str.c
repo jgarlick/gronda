@@ -265,6 +265,10 @@ string_t *string_dup (string_t * source)
 	return string_alloc ("%s", source->data);
 }
 
+int string_length(string_t *str) {
+	return (str->data ? strlen(str->data) : 0);
+}
+
 void string_debug (string_t * s)
 {
 	if (!s)
