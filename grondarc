@@ -41,4 +41,6 @@ kd ^d     ed ke
 kd ^s     pw ke
 kd ^q     wc ke
 
+kd ^g     // ke
+
 showtabs -off
