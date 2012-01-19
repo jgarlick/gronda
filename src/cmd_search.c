@@ -24,6 +24,7 @@ void cmd_search (int argc, char *argv[])
 	int r;
 	int start_x, y, intab;
 	char *ptr;
+	char buf[255];
 
 	if(argc > 1) {
 //		debug("searching for %s", argv[1]);
@@ -62,7 +63,8 @@ void cmd_search (int argc, char *argv[])
 			move_cursor_into_view(pad);
 			output_message("");
 		} else if(r != REG_NOMATCH) {
-			output_message("error");
+			regerror(r, &(pad->search), buf, 255);
+			output_message(buf);
 		}
 		y++;
 		l = l->next;
