@@ -1,5 +1,5 @@
 #
-#  Gronda Edit Makefile for Linux based systems
+#  Gronda Text Editor Makefile for Unix based systems
 #
 
 BINARY_NAME     = gronda

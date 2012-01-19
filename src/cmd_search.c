@@ -1,4 +1,4 @@
-/*  Gronda/Ce
+/*  Gronda Text Editor
  *  Copyright (C) 2002-2012 James Garlick and Graeme Jefferis
  *
  *  This program is free software; you can redistribute it and/or modify
