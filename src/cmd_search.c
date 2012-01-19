@@ -37,9 +37,6 @@ void cmd_search (int argc, char *argv[])
 			output_message ("Could not compile regex");
 			return; 
 		}
-/*	} else if((pad->search).allocated > 0) {
-		output_message("No stored search to use");
-		return;*/
 	}
 
 	r = REG_NOMATCH;
@@ -56,12 +53,17 @@ void cmd_search (int argc, char *argv[])
 //				debug("searching from %s", ptr);
 			}
 //			debug("match string = %s", ptr);
-			if(start_x > 0)
-				flags = REG_NOTBOL;
-			else
-				flags = 0;
+			/* only perform the search if we are not past the end of the line, 
+			   unless the line is empty and we are right at the start of it 
+			   (so that /$/ works for empty lines) */
+			if(*ptr || (string_length(l->str) == 0 && start_x == 0)) {
+				if(start_x > 0)
+					flags = REG_NOTBOL;
+				else
+					flags = 0;
 			
-			r = regexec(&(pad->search), ptr, 10, matchptr, flags);
+				r = regexec(&(pad->search), ptr, 10, matchptr, flags);
+			}
 		}
 		if (!r) {
 			pad->curs_x = get_curs_pos(matchptr[0].rm_so + start_x, l) - pad->offset_x;
