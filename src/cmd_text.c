@@ -33,7 +33,7 @@ void cmd_es (int argc, char *argv[])
 
 	if (!(e->cpad->flags & FILE_WRITE))
 	{
-		output_message_c ("es", "Pad is read-only.");
+		output_message_c ("es", "Pad is read-only");
 		return;
 	}
 
