@@ -5,6 +5,8 @@
 	#include <ctype.h>
 	#include "editor.h"
 
+	#define MAX_ARGS (32)
+
 	string_t *buf;
 	char token_buf[64];
 	char *ptr;
@@ -14,8 +16,26 @@
 
 	char quote_delimiter;
 
-	char *vargs[32];
+	char *vargs[MAX_ARGS];
 	int i = 0;
+
+	void add_arg(char *str) {
+		if (i < MAX_ARGS)
+			vargs[i++] = strdup(str);
+		else
+			debug("[lex] Out of tokens.");	
+	}
+
+	void execute_and_reset() {
+		int j;
+		if (i != 0) {
+			execute_command(i, vargs);
+
+			for (j = 0; j < i; j++)
+				free(vargs[j]);
+		}
+		i = 0;	
+	}
 
 	void execute_search() {
 		token_buf[0] = quote_delimiter;
@@ -113,10 +133,7 @@ kd{ws}[^[:blank:]]+{ws} {
 			if (*yytext == quote_delimiter)
 			{
 				BEGIN 0; /* Back into normal parse mode. */
-				if (i < 32)
-					vargs[i++] = strdup(buf->data);
-				else
-					debug(" [lex] Out of tokens.");
+				add_arg(buf->data);
 				string_free(buf);
 			}
 			else
@@ -135,8 +152,8 @@ kd{ws}[^[:blank:]]+{ws} {
 		}
 
 {ws}	{
-	if (strlen(word->data) > 0 && i < 32) {
-		vargs[i++] = strdup(word->data);
+	if (strlen(word->data) > 0) {
+		add_arg(word->data);
 		string_truncate(word, 0);
 	}
 }
@@ -194,38 +211,21 @@ kd{ws}[^[:blank:]]+{ws} {
 }
 
 {word} {
-       debug("found word %s", yytext);
-		if (i < 32) vargs[i++] = strdup(yytext);
+		debug("found word %s", yytext);
+		add_arg(yytext);
 	}
 {number} {
-	debug("found num %s", yytext);
-		if (i < 32) vargs[i++] = strdup(yytext);
+		debug("found num %s", yytext);
+		add_arg(yytext);
 	}
 
 
 <<EOF>>		{
-			int j;
-			if (i != 0)
-			{
-				execute_command(i, vargs);
-
-				for (j = 0; j < i; j++)
-					free(vargs[j]);
-			}
-
-			i = 0;
+			execute_and_reset();
 			yyterminate();
 		}
 {delimiter}|\n	{
-			int j;
-			if (i != 0)
-			{
-				execute_command(i, vargs);
-
-				for (j = 0; j < i; j++)
-					free(vargs[j]);
-			}
-			i = 0;
+			execute_and_reset();
 		}
 .		{
 		debug (" [lex] *** Unexpected character! ***\n");

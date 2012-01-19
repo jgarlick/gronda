@@ -500,6 +500,8 @@ char *yytext;
 	#include <ctype.h>
 	#include "editor.h"
 
+	#define MAX_ARGS (32)
+
 	string_t *buf;
 	char token_buf[64];
 	char *ptr;
@@ -509,8 +511,26 @@ char *yytext;
 
 	char quote_delimiter;
 
-	char *vargs[32];
+	char *vargs[MAX_ARGS];
 	int i = 0;
+
+	void add_arg(char *str) {
+		if (i < MAX_ARGS)
+			vargs[i++] = strdup(str);
+		else
+			debug("[lex] Out of tokens.");	
+	}
+
+	void execute_and_reset() {
+		int j;
+		if (i != 0) {
+			execute_command(i, vargs);
+
+			for (j = 0; j < i; j++)
+				free(vargs[j]);
+		}
+		i = 0;	
+	}
 
 	void execute_search() {
 		token_buf[0] = quote_delimiter;
@@ -535,7 +555,7 @@ char *yytext;
 
 
 
-#line 539 "../lex.c"
+#line 559 "../lex.c"
 
 #define INITIAL 0
 #define STRING 1
@@ -720,11 +740,11 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 59 "gce.lex"
+#line 79 "gce.lex"
 
 	word = string_alloc("");
 	
-#line 728 "../lex.c"
+#line 748 "../lex.c"
 
 	if ( !(yy_init) )
 		{
@@ -810,7 +830,7 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 62 "gce.lex"
+#line 82 "gce.lex"
 { 
 	BEGIN DEF;
 	
@@ -828,7 +848,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 76 "gce.lex"
+#line 96 "gce.lex"
 {
 	vargs[0] = "kd";
 	vargs[1] = token_buf;
@@ -843,13 +863,13 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 87 "gce.lex"
+#line 107 "gce.lex"
 {
 	string_append(buf, "%c", *yytext);
 }
 	YY_BREAK
 case YY_STATE_EOF(DEF):
-#line 90 "gce.lex"
+#line 110 "gce.lex"
 {
 	BEGIN 0;
 	string_free(buf);
@@ -857,7 +877,7 @@ case YY_STATE_EOF(DEF):
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 95 "gce.lex"
+#line 115 "gce.lex"
 {
 			BEGIN STRING;
 			buf = string_alloc("");
@@ -866,43 +886,40 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 100 "gce.lex"
+#line 120 "gce.lex"
 {
 			string_append(buf, "\n");
 		}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 103 "gce.lex"
+#line 123 "gce.lex"
 {
 			string_append(buf, "\t");
 		}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 106 "gce.lex"
+#line 126 "gce.lex"
 {
 			string_append(buf, "\'");
 		}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 109 "gce.lex"
+#line 129 "gce.lex"
 {
 			string_append(buf, "\"");
 		}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 112 "gce.lex"
+#line 132 "gce.lex"
 {
 			if (*yytext == quote_delimiter)
 			{
 				BEGIN 0; /* Back into normal parse mode. */
-				if (i < 32)
-					vargs[i++] = strdup(buf->data);
-				else
-					debug(" [lex] Out of tokens.");
+				add_arg(buf->data);
 				string_free(buf);
 			}
 			else
@@ -910,7 +927,7 @@ YY_RULE_SETUP
 		}
 	YY_BREAK
 case YY_STATE_EOF(STRING):
-#line 125 "gce.lex"
+#line 142 "gce.lex"
 {	debug(" [lex] Quotes don't match.");
 			BEGIN 0;
 			string_free(buf);
@@ -919,7 +936,7 @@ case YY_STATE_EOF(STRING):
 case 10:
 /* rule 10 can match eol */
 YY_RULE_SETUP
-#line 129 "gce.lex"
+#line 146 "gce.lex"
 {	debug(" [lex] Quotes don't match.");
 			BEGIN 0;
 			string_free(buf);
@@ -927,24 +944,24 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 133 "gce.lex"
+#line 150 "gce.lex"
 {
 			string_append(buf, "%c", *yytext);
 		}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 137 "gce.lex"
+#line 154 "gce.lex"
 {
-	if (strlen(word->data) > 0 && i < 32) {
-		vargs[i++] = strdup(word->data);
+	if (strlen(word->data) > 0) {
+		add_arg(word->data);
 		string_truncate(word, 0);
 	}
 }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 144 "gce.lex"
+#line 161 "gce.lex"
 {
 	ptr = yytext + 1;
 	ptr2 = token_buf;
@@ -966,7 +983,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 163 "gce.lex"
+#line 180 "gce.lex"
 {
 	BEGIN SEARCH;
 
@@ -977,14 +994,14 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 171 "gce.lex"
+#line 188 "gce.lex"
 {
 	string_append(buf, "%c", *yytext);
 }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 175 "gce.lex"
+#line 192 "gce.lex"
 {
 	if (*yytext == quote_delimiter)
 		execute_search();
@@ -994,20 +1011,20 @@ YY_RULE_SETUP
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 181 "gce.lex"
+#line 198 "gce.lex"
 {
 	string_append(buf, "%c", *yytext);
 }
 	YY_BREAK
 case YY_STATE_EOF(SEARCH):
-#line 185 "gce.lex"
+#line 202 "gce.lex"
 {
 	execute_search();
 }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 189 "gce.lex"
+#line 206 "gce.lex"
 {
 	token_buf[0] = *yytext;
 	token_buf[1] = '\0';
@@ -1017,50 +1034,33 @@ YY_RULE_SETUP
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 196 "gce.lex"
+#line 213 "gce.lex"
 {
-       debug("found word %s", yytext);
-		if (i < 32) vargs[i++] = strdup(yytext);
+		debug("found word %s", yytext);
+		add_arg(yytext);
 	}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 200 "gce.lex"
+#line 217 "gce.lex"
 {
-	debug("found num %s", yytext);
-		if (i < 32) vargs[i++] = strdup(yytext);
+		debug("found num %s", yytext);
+		add_arg(yytext);
 	}
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 206 "gce.lex"
+#line 223 "gce.lex"
 {
-			int j;
-			if (i != 0)
-			{
-				execute_command(i, vargs);
-
-				for (j = 0; j < i; j++)
-					free(vargs[j]);
-			}
-
-			i = 0;
+			execute_and_reset();
 			yyterminate();
 		}
 	YY_BREAK
 case 21:
 /* rule 21 can match eol */
 YY_RULE_SETUP
-#line 219 "gce.lex"
+#line 227 "gce.lex"
 {
-			int j;
-			if (i != 0)
-			{
-				execute_command(i, vargs);
-
-				for (j = 0; j < i; j++)
-					free(vargs[j]);
-			}
-			i = 0;
+			execute_and_reset();
 		}
 	YY_BREAK
 case 22:
