@@ -129,7 +129,7 @@ void cmd_pp (int argc, char *argv[])
 	if (argc == 0)
 		offset = pad->height;
 	else
-		offset = (pad->height) * atof (argv[1]);
+		offset = pad->height * atof (argv[1]);
 
 	if (offset != 0)
 	{
@@ -138,17 +138,17 @@ void cmd_pp (int argc, char *argv[])
 
 		if (pad->offset_y < 0)
 		{
-			offset -= (pad->offset_y);
-			offset = abs (offset);
+			offset -= pad->offset_y;
+			offset = abs(offset);
 			pad->offset_y = 0;
-			output_message ("(pp) Top of file (pp)");
+			output_message_c ("pp", "Top of file");
 		}
 
-		if ((pad->offset_y) > (pad->line_count))
+		if (pad->offset_y > pad->line_count)
 		{
-			offset -= ((pad->offset_y) - (pad->line_count - 1));
-			pad->offset_y = (pad->line_count) - 1;
-			output_message ("(pp) Bottom of file (pp)");
+			offset -= (pad->offset_y - pad->line_count - 1);
+			pad->offset_y = pad->line_count - 1;
+			output_message_c ("pp", "Bottom of file");
 		}
 	}
 }

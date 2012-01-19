@@ -6,8 +6,8 @@
 
 kd bs     ee -w ke
 kd del    ed ke
-kd pgdown pv 10 ke
-kd pgup   pv -10 ke
+kd pgdown pp 0.5 ke
+kd pgup   pp -0.5 ke
 kd home   tl ke
 kd end    tr ke
 kd right  ar ke
