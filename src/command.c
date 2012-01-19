@@ -50,6 +50,7 @@ void add_base_commands ()
 	add_command ("ro",   cmd_ro);
 
 	/* pad */
+	add_command ("=",    cmd_position);
 	add_command ("ph",   cmd_ph);
 	add_command ("pp",   cmd_pp);
 	add_command ("pt",   cmd_pt);

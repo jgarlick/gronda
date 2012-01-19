@@ -19,6 +19,10 @@
 
 #include "editor.h"
 
+void cmd_position(int argc, char *argv[]) {
+	output_message("[%d,%d]", pad_pos_x(e->cpad), pad_pos_y(e->cpad));
+}
+
 void cmd_ph (int argc, char *argv[])
 {
 	int    offset = 1;
