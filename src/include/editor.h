@@ -251,6 +251,7 @@ void cmd_position(int argc, char *argv[]);
 void cmd_ph   (int argc, char *argv[]);
 void cmd_pp   (int argc, char *argv[]);
 void cmd_pt   (int argc, char *argv[]);
+void cmd_pb   (int argc, char *argv[]);
 void cmd_pv   (int argc, char *argv[]);
 
 /* cmd_system.c */

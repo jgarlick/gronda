@@ -54,6 +54,7 @@ void add_base_commands ()
 	add_command ("ph",   cmd_ph);
 	add_command ("pp",   cmd_pp);
 	add_command ("pt",   cmd_pt);
+	add_command ("pb",   cmd_pb);
 	add_command ("pv",   cmd_pv);
 
 	/* text */

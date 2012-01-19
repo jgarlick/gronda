@@ -94,16 +94,29 @@ void cmd_pv (int argc, char *argv[])
 
 void cmd_pt (int argc, char *argv[])
 {
-	int     ypos;
 	pad_t  *pad = e->cpad;
+	int     pad_y;
 
-	ypos = (pad->curs_y) + (pad->offset_y);
+	pad_y = pad_pos_y(pad);
 	pad->offset_y = 0;
 
-	if (ypos < pad->height)
-	{
-		pad->curs_y = ypos;
-	}
+	if (pad_y < pad->height)
+		pad->curs_y = pad_y;
+
+	e->redraw |= DIRTY_ALL;
+}
+
+void cmd_pb (int argc, char *argv[])
+{
+	pad_t  *pad = e->cpad;
+	int     pad_y;
+
+	pad_y = pad_pos_y(pad);
+	pad->offset_y = pad->line_count - pad->height;
+	if(pad->offset_y < 0) pad->offset_y = 0;
+
+	if (pad_y > pad->offset_y)
+		pad->curs_y = pad_y - pad->offset_y;
 
 	e->redraw |= DIRTY_ALL;
 }
