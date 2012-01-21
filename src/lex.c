@@ -1067,7 +1067,7 @@ case 22:
 YY_RULE_SETUP
 #line 230 "gce.lex"
 {
-		debug (" [lex] *** Unexpected character! ***\n");
+		debug (" [lex] *** Unexpected character! ***");
 		}
 	YY_BREAK
 case 23:

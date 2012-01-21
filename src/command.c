@@ -159,9 +159,7 @@ void add_command (const char *name, void (*func) ())
 
 	if (new)
 	{
-		debug ("Command overridden: %s\n", name);
 		new->func = func;
-
 		return;
 	}
 
@@ -173,8 +171,6 @@ void add_command (const char *name, void (*func) ())
 
 	new->next = command_ptrs[a];
 	command_ptrs[a] = new;
-
-	debug ("Command added: %s\n", name);
 }
 
 void remove_command (char *name)

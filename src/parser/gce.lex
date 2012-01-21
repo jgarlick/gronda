@@ -228,7 +228,7 @@ kd{ws}[^[:blank:]]+{ws} {
 			execute_and_reset();
 		}
 .		{
-		debug (" [lex] *** Unexpected character! ***\n");
+		debug (" [lex] *** Unexpected character! ***");
 		}
 
 %%

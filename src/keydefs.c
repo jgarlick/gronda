@@ -76,7 +76,6 @@ KEY_define (char *key_name, char *def)
 
 	if (new)
 	{
-		debug ("Keydef overridden: %s\n", key_name);
 		free(new->def);
 		new->def = strdup(def);
 
@@ -91,8 +90,6 @@ KEY_define (char *key_name, char *def)
 
 	new->next = keydef_ptrs[a];
 	keydef_ptrs[a] = new;
-
-	debug ("Keydef added: %s\n", key_name);
 }
 
 keydef_t   *
