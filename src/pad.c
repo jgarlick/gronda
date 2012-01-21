@@ -38,6 +38,24 @@ pad_t *pad_new()
 	return new;
 }
 
+pad_t *pad_add() {
+	pad_t *cpad, *new;
+
+	cpad = e->cepad;
+	new  = pad_new();
+	if(cpad) {
+		new->next = cpad->next;
+		cpad->next = new;
+		
+		new->width  = cpad->width;
+		new->height = cpad->height;
+	}
+	e->cpad = e->cepad = new;
+	if (e->pad_head == NULL) e->pad_head = new;
+
+	return new;
+}
+
 void pad_set_viewport_size(pad_t *pad, int width, int height)
 {
 	pad->width  = width;

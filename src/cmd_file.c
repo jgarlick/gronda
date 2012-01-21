@@ -35,8 +35,8 @@ void cmd_ce (int argc, char *argv[])
 	string_t    *buf;
 	char        *c;
 	struct stat st_buf;
-
 	char   *args[2];
+	pad_t  *pad;
 
 	if (argc == 1)
 	{
@@ -61,18 +61,13 @@ void cmd_ce (int argc, char *argv[])
 		return;
 	}
 
-	e->cpad->filename = strdup (argv[1]);
+	pad = pad_add();
+
+	pad->filename = strdup (argv[1]);
 	e->redraw |= (DIRTY_ALL | TITLE | STATS);
 
 	if (!f)
-	{
-		e->cpad->flags |= FILE_WRITE;
 		return;
-	}
-
-	e->cpad->curs_x   = 1;
-	e->cpad->curs_y   = 1;
-	e->cpad->flags |= FILE_WRITE;
 
 	buf = string_alloc ("");
 
@@ -117,17 +112,17 @@ void cmd_ce (int argc, char *argv[])
 
 	fclose (f);
 
-	e->cpad->curs_x   = 1;
-	e->cpad->curs_y   = 1;
-	e->cpad->offset_x = 0;
-	e->cpad->offset_y = 0;
-	e->cpad->flags    = 0;
+	pad->curs_x   = 1;
+	pad->curs_y   = 1;
+	pad->offset_x = 0;
+	pad->offset_y = 0;
+	pad->flags    = 0;
 
 	/* set the read/write / read only mode */
-	if (access (e->cpad->filename, W_OK) != -1)
-		e->cpad->flags |= FILE_WRITE;
+	if (access (pad->filename, W_OK) != -1)
+		pad->flags |= FILE_WRITE;
 	else
-		e->cpad->flags &= ~FILE_WRITE;
+		pad->flags &= ~FILE_WRITE;
 }
 
 /* pad write */

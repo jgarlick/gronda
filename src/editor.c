@@ -29,10 +29,6 @@ void editor_init ()
 	}
 
 	e->occupied_window = EDIT_WINDOW;
-
-	/* new pad */
-	e->pad_head = pad_new();
-	e->cpad = e->cepad = e->pad_head;
 	
 	e->input_pad  = pad_new();
 	e->output_pad = pad_new();
@@ -122,6 +118,8 @@ void editor_setup (int argc, char **argv)
 	
 	if (args[1] != 0) {
 		cmd_ce (2, args);
+	} else {
+		pad_add();
 	}
 }
 

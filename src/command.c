@@ -65,6 +65,7 @@ void add_base_commands ()
 	add_command ("pt",   cmd_pt);
 	add_command ("pb",   cmd_pb);
 	add_command ("pv",   cmd_pv);
+	add_command ("tn",   cmd_tn);
 
 	/* text */
 	add_command ("es",   cmd_es);

@@ -126,7 +126,7 @@ typedef struct editor_s
 {
 	occupied_window_t occupied_window;
 
-	input_t *input;				/* command window */
+	input_t *input;				/* command window - legacy for terminal interface only */
 
 	pad_t *input_pad;
 	pad_t *output_pad;
@@ -171,6 +171,7 @@ void    editor_setup (int, char **);
 
 /* pad.c */
 pad_t *pad_new(void);
+pad_t *pad_add();
 void pad_set_viewport_size(pad_t *, int, int);
 char pad_get_char_at (pad_t *p, int y, int x);
 void pad_modified (pad_t *pad);
@@ -254,6 +255,7 @@ void cmd_pp   (int argc, char *argv[]);
 void cmd_pt   (int argc, char *argv[]);
 void cmd_pb   (int argc, char *argv[]);
 void cmd_pv   (int argc, char *argv[]);
+void cmd_tn   (int argc, char *argv[]);
 
 /* cmd_system.c */
 void cmd_bang (int argc, char *argv[]);

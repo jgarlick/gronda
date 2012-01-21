@@ -168,3 +168,13 @@ void cmd_pp (int argc, char *argv[])
 		}
 	}
 }
+
+void cmd_tn (int argc, char *argv[])
+{
+	pad_t *next;
+	
+	next = e->cepad->next;
+	if (next == NULL) next = e->pad_head;
+
+	e->cepad = e->cpad = next;
+}

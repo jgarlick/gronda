@@ -67,9 +67,15 @@ public:
 	
 protected:
 	void set_viewport_size(int W, int H) {
+		pad_t *pad;
 		viewport_w = floor((W - 6) / fl_width(' '));
 		viewport_h = floor((H - 8) / fl_height()) - 1;
-		pad_set_viewport_size(e->cpad, viewport_w, viewport_h);
+
+		pad = e->cepad;
+		while(pad != NULL) {
+			pad_set_viewport_size(pad, viewport_w, viewport_h);
+			pad = pad->next;
+		}
 	}
 
 	void resize(int X, int Y, int W, int H) {
