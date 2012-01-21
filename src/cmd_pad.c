@@ -36,7 +36,7 @@ void cmd_goto_line(int argc, char *argv[]) {
 }
 
 void cmd_position(int argc, char *argv[]) {
-	output_message("[%d,%d]", pad_pos_x(e->cpad), pad_pos_y(e->cpad));
+	output_message("[%d,%d]", pad_pos_y(e->cpad), pad_pos_x(e->cpad));
 }
 
 void cmd_ph (int argc, char *argv[])
