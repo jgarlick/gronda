@@ -24,7 +24,6 @@ void cmd_goto_line(int argc, char *argv[]) {
 	int line_num;
 
 	line_num = atoi(argv[0]);
-	debug("GOTO LINE %d" ,line_num);
 	if (line_num < 1) {
 		line_num = 1;
 	}
