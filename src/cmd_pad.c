@@ -19,6 +19,23 @@
 
 #include "editor.h"
 
+void cmd_goto_line(int argc, char *argv[]) {
+	pad_t  *pad = e->cpad;
+	int line_num;
+
+	line_num = atoi(argv[0]);
+	debug("GOTO LINE %d" ,line_num);
+	if (line_num < 1) {
+		line_num = 1;
+	}
+	if (line_num > pad->line_count) {
+		line_num = pad->line_count;
+	}
+	pad->curs_y = line_num - pad->offset_y;
+	move_cursor_into_view(pad);
+
+}
+
 void cmd_position(int argc, char *argv[]) {
 	output_message("[%d,%d]", pad_pos_x(e->cpad), pad_pos_y(e->cpad));
 }
@@ -152,4 +169,3 @@ void cmd_pp (int argc, char *argv[])
 		}
 	}
 }
-

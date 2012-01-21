@@ -50,6 +50,15 @@ void add_base_commands ()
 	add_command ("ro",   cmd_ro);
 
 	/* pad */
+	add_command ("1",    cmd_goto_line);
+	add_command ("2",    cmd_goto_line);
+	add_command ("3",    cmd_goto_line);
+	add_command ("4",    cmd_goto_line);
+	add_command ("5",    cmd_goto_line);
+	add_command ("6",    cmd_goto_line);
+	add_command ("7",    cmd_goto_line);
+	add_command ("8",    cmd_goto_line);
+	add_command ("9",    cmd_goto_line);
 	add_command ("=",    cmd_position);
 	add_command ("ph",   cmd_ph);
 	add_command ("pp",   cmd_pp);
@@ -92,27 +101,19 @@ int get_index (char a)
 command_t *find_command (const char *name)
 {
 	command_t *mover;
-	int     a;
-
+	int a;
 
 	a = get_index (*name);
-
 	mover = command_ptrs[a];
 
-	while (mover)
-	{
-
-		if (a == 26)
-		{
+	while (mover) {
+		if (a == 26) {
 			if (*name == *(mover->name))
 				return mover;
-		}
-		else
-		{
+		} else {
 			if (!strcasecmp (name, mover->name))
 				return mover;
 		}
-
 		mover = mover->next;
 	}
 
@@ -122,7 +123,6 @@ command_t *find_command (const char *name)
 void execute_command (int argc, char *argv[])
 {
 	command_t *c;
-
 
 	if (sigsetjmp (env, 1))
 	{
