@@ -54,7 +54,6 @@ void cmd_ph (int argc, char *argv[])
 	{
 		offset -= pad->offset_x;
 		pad->offset_x = 0;
-		debug ("(ph) Left margin (ph)");
 	}
 
 	pad->curs_x -= offset;
@@ -149,7 +148,6 @@ void cmd_pp (int argc, char *argv[])
 
 	if (offset != 0)
 	{
-		debug ("pp %s\n", argv[1]);
 		pad->offset_y += offset;
 
 		if (pad->offset_y < 0)
