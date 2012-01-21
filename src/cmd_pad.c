@@ -68,7 +68,7 @@ void cmd_ph (int argc, char *argv[])
 		adjust = ADJUST_RIGHT;
 
 	/* adjust the cursor if we have been placed in the middle of a tab */
-	cursor_set_pos (e->cpad, e->cpad->curs_y, e->cpad->curs_x, adjust);
+	cursor_set_pos (pad, pad->curs_y, pad->curs_x, adjust);
 
 	e->redraw |= DIRTY_ALL;
 }
@@ -102,7 +102,7 @@ void cmd_pv (int argc, char *argv[])
 		pad->curs_y = pad->height;
 
 	/* adjust the cursor if we have been placed in the middle of a tab */
-	cursor_set_pos (e->cpad, e->cpad->curs_y, e->cpad->curs_x, ADJUST_LEFT);
+	cursor_set_pos (pad, pad->curs_y, pad->curs_x, ADJUST_LEFT);
 
 	e->redraw |= DIRTY_ALL;
 }
