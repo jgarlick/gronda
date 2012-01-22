@@ -146,9 +146,8 @@ void buffer_cutcopy (buffer_t *buf, int cut, int shape, int start_y, int start_x
 	line_t *top = NULL;
 	char   *s;
 	pad_t  *p = e->cpad;
-	int     len, copied_len;
-	int     start;
-	int     intab;
+	int     len, copied_len, line_len;
+	int     start, end, intab;
 	int     modified = 0;
 
 	l = LINE_get_line_at (p, start_y);
@@ -160,13 +159,9 @@ void buffer_cutcopy (buffer_t *buf, int cut, int shape, int start_y, int start_x
 		next = l->next;
 
 		if (l->str == NULL)
-		{
 			s = "";
-		}
 		else
-		{
 			s = l->str->data;
-		}
 
 		if (shape & REGION_LINEAR)
 		{
@@ -174,25 +169,27 @@ void buffer_cutcopy (buffer_t *buf, int cut, int shape, int start_y, int start_x
 			if (a == start_y)
 			{
 				start = get_string_pos (start_x, s, &intab);
-
-				s += (start_x - 1 > len) ? len : start_x - 1;
+				s += (start > len) ? len : start;
+				len = strlen(s);
 			}
 			else
 				start = 0;
 
 			if (a == end_y)
 			{
-				start = (a == start_y) ? start_x : 1;
-
+				end = get_string_pos (end_x - (a == start_y ? start_x : 1), s, &intab);
+					
 				strcpy (temp, s);
-				temp[end_x - start] = '\0';
+				temp[end + 1] = '\0';
 
 				s = temp;
 			}
-			
+
+			line_len = line_length(l) + 1; /* get the visible line length (not the same as str len) */
+
 			/* if we are not on the last line, 
 			   or the cursor is past the end of the line and it starts before the end of the line */
-			if (a != end_y || (end_x > (len + 1) && !(a == start_y && start > (len + 1))))
+			if (a != end_y || (end_x > line_len && !(a == start_y && start > line_len)))
 			{
 				string_append (buf->str, "%s\n", s);
 
@@ -201,17 +198,17 @@ void buffer_cutcopy (buffer_t *buf, int cut, int shape, int start_y, int start_x
 					if (a != start_y)
 						LINE_remove (p, l);
 					else
-						string_remove (l->str, start_x - 1, len);
+						string_remove (l->str, start, len);
+
 					modified = 1;
 				}
-			}
-			else
-			{
+			} else { /* last line */
+				/* TODO: when end_x > line_len we need to include the newline and merge with the next line */
 				string_append (buf->str, "%s", s);
 
 				if (cut)
 				{
-					string_remove (l->str, start - 1, end_x - start);
+					string_remove (l->str, start, end + 1);
 
 					if (start_y != end_y && top)
 					{
