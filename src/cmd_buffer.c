@@ -112,7 +112,7 @@ void cmd_xa (int argc, char *argv[])
 void cmd_xp (int argc, char *argv[])
 {
 	char     *buf_name;
-	int      curs_y, curs_x;
+	int      curs_y, offset_y, offset_x, curs_x;
 	buffer_t *mover;
 	pad_t    *p = e->cpad;
 	char     *args[2];
@@ -167,8 +167,10 @@ void cmd_xp (int argc, char *argv[])
 
 	if (mover->str && mover->str->data && strlen (mover->str->data) > 0)
 	{
-		curs_y = p->curs_y;
-		curs_x = p->curs_x;
+		curs_y   = p->curs_y;
+		curs_x   = p->curs_x;
+		offset_x = p->offset_x;
+		offset_y = p->offset_y;
 
 		if (force_overstrike)
 		{
@@ -206,7 +208,8 @@ void cmd_xp (int argc, char *argv[])
 				else /* REGION_RECT */
 				{
 					p->curs_y++;
-					p->curs_x = curs_x;
+					p->curs_x   = curs_x;
+					p->offset_x = offset_x;
 				}
 			}
 			start = end;
@@ -215,8 +218,10 @@ void cmd_xp (int argc, char *argv[])
 		if (force_overstrike)
 			e->flags = flags;
 
-		p->curs_y = curs_y;
-		p->curs_x = curs_x;
+		p->curs_y   = curs_y;
+		p->curs_x   = curs_x;
+		p->offset_x = offset_x;
+		p->offset_y = offset_y;
 	}
 }
 
