@@ -225,10 +225,12 @@ void buffer_cutcopy (buffer_t *buf, int cut, int shape, int start_y, int start_x
 		}
 		else /* REGION_RECT */
 		{
-			len = end_x - start_x;
-			if ((size_t)start_x <= strlen (s))
-			{
-				s += start_x - 1;
+			start = get_string_pos (start_x, s, &intab);
+			end   = get_string_pos (end_x,   s, &intab);
+
+			len = end - start;
+			if ((size_t)start <= strlen (s)) {
+				s += start;
 				strncpy (temp, s, len);
 			}
 			temp[len] = '\0';
@@ -245,7 +247,7 @@ void buffer_cutcopy (buffer_t *buf, int cut, int shape, int start_y, int start_x
 				string_append (buf->str, "%s", temp);
 
 			if (cut) {
-				string_remove (l->str, start_x - 1, len);
+				string_remove (l->str, start, len);
 				modified = 1;
 			}
 		}
