@@ -59,16 +59,12 @@ int font = FL_COURIER;
 #endif
 int font_size = 13;
 
-int mouse_to_cursor = 1;
+int mouse_to_cursor   = 1;
+int show_line_numbers = 1;
 
 class EditViewport : public Fl_Widget {
 public:
 	int viewport_w, viewport_h;
-	
-protected:
-	int line_num_width() {
-		return (fl_width(' ') * 4) + 4;
-	}
 	
 	void set_viewport_size(int W, int H) {
 		pad_t *pad;
@@ -81,7 +77,12 @@ protected:
 			pad = pad->next;
 		}
 	}
-
+	
+protected:
+	int line_num_width() {
+		return show_line_numbers ? (fl_width(' ') * 4) + 4 : 0;
+	}
+	
 	void resize(int X, int Y, int W, int H) {
 		set_viewport_size(W, H);
 	  	Fl_Widget::resize(X,Y,W,H);
@@ -165,7 +166,9 @@ protected:
 
 		/* line num decoration */
 //		fl_rectf(3, fl_height() + 8, line_num_width() - 2, h());
-		fl_line(line_num_width(), fl_height() + 8, line_num_width(), h());
+		if (show_line_numbers) {
+			fl_line(line_num_width(), fl_height() + 8, line_num_width(), h());
+		}
 
 		lines_start_y = y() + 8 + (fl_height() * 2 - fl_descent());
 
@@ -233,7 +236,7 @@ protected:
 			}
 
 			/* draw line number first */
-			if (line != pad->line_head) {
+			if (show_line_numbers && line != pad->line_head) {
 				fl_font(font, font_size - 2);
 				fl_color(line_num_color);
 				sprintf(line_buffer, "%4d", line_num);
@@ -571,6 +574,26 @@ extern "C" void cmd_sic (int argc, char *argv[])
 	edit_viewport->move_cursor(Fl::event_x(), Fl::event_y());
 }
 
+extern "C" void cmd_lineno (int argc, char *argv[])
+{
+	if (argc > 1)
+	{
+		if (strcmp (argv[1], "-on") == 0)
+		{
+			show_line_numbers = 1;
+		}
+		else if (strcmp (argv[1], "-off") == 0)
+		{
+			show_line_numbers = 0;
+		}
+	}
+	else
+		show_line_numbers = !show_line_numbers;
+		
+	edit_viewport->set_viewport_size(edit_viewport->w(), edit_viewport->h());
+}
+
+
 int main(int argc, char **argv) {
 	int font_height;
 	int font_width;
@@ -579,6 +602,7 @@ int main(int argc, char **argv) {
 	editor_setup(argc, argv);
 	add_command ("mouse",  (void (*)())cmd_mouse);
 	add_command ("sic",    (void (*)())cmd_sic);
+	add_command ("lineno", (void (*)())cmd_lineno);
 
 	bg_color       = fl_rgb_color(254, 255, 231);
 	line_color     = fl_rgb_color(71, 43, 198);
