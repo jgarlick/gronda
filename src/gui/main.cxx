@@ -62,16 +62,26 @@ int font_size = 13;
 int mouse_to_cursor   = 1;
 int show_line_numbers = 1;
 
+int digits(int number) {
+	int digits = 1;
+	int step = 10;
+	while (step <= number) {
+		digits++;
+		step *= 10;
+	}
+	return digits;
+}
+
 class EditViewport : public Fl_Widget {
 public:
-	int viewport_w, viewport_h;
+	int viewport_w, viewport_h, line_num_columns;
 	
 	void set_viewport_size(int W, int H) {
 		pad_t *pad;
-		viewport_w = floor((W - (6 + line_num_width())) / fl_width(' '));
 		viewport_h = floor((H - 8) / fl_height()) - 1;
+		viewport_w = floor((W - (6 + line_num_width())) / fl_width(' '));
 
-		pad = e->cepad;
+		pad = e->pad_head;
 		while(pad != NULL) {
 			pad_set_viewport_size(pad, viewport_w, viewport_h);
 			pad = pad->next;
@@ -80,7 +90,10 @@ public:
 	
 protected:
 	int line_num_width() {
-		return show_line_numbers ? (fl_width(' ') * 4) + 4 : 0;
+		line_num_columns = (e->cepad == NULL ? 4 : digits(e->cepad->offset_y + viewport_h));
+		if (line_num_columns < 4) line_num_columns = 4;
+
+		return show_line_numbers ? (fl_width(' ') * line_num_columns) + 4 : 0;
 	}
 	
 	void resize(int X, int Y, int W, int H) {
@@ -239,7 +252,7 @@ protected:
 			if (show_line_numbers && line != pad->line_head) {
 				fl_font(font, font_size - 2);
 				fl_color(line_num_color);
-				sprintf(line_buffer, "%4d", line_num);
+				sprintf(line_buffer, "%*d", line_num_columns, line_num);
 				fl_draw(line_buffer, 3, yp);
 			}
 
