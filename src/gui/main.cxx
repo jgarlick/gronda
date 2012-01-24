@@ -50,7 +50,7 @@ void display_finish_menu ()
 {
 }
 
-Fl_Color bg_color, line_color, text_color;
+Fl_Color bg_color, line_color, text_color, line_num_color;
 
 #if defined(__APPLE__)
 int font = FL_SCREEN;
@@ -66,9 +66,13 @@ public:
 	int viewport_w, viewport_h;
 	
 protected:
+	int line_num_width() {
+		return (fl_width(' ') * 4) + 4;
+	}
+	
 	void set_viewport_size(int W, int H) {
 		pad_t *pad;
-		viewport_w = floor((W - 6) / fl_width(' '));
+		viewport_w = floor((W - (6 + line_num_width())) / fl_width(' '));
 		viewport_h = floor((H - 8) / fl_height()) - 1;
 
 		pad = e->cepad;
@@ -95,6 +99,8 @@ protected:
 		char empty_string[1] = "";
 		int lines_start_y;
 		pad_t *pad;
+		int pad_start_x;
+		int line_num;
 
 		int start_y = 0;
 		int start_x = 0;
@@ -102,6 +108,8 @@ protected:
 		int end_x   = 0;
 
 		pad = e->cepad;
+		
+		pad_start_x = x() + 3 + line_num_width();
 		
 		if (pad->echo)
 		{
@@ -118,7 +126,7 @@ protected:
 		/* background */
 		fl_color(bg_color);
 		fl_rectf(x(), y(), w(), h());
-
+		
 		/* lines at sides */
 		fl_color(line_color);
 		fl_line(x(), y() + 2, x(), h());
@@ -155,6 +163,9 @@ protected:
 			fl_draw("M", x() + w() - (68 + fl_width(' ') / 2), y() + 5 + fl_height() - fl_descent());
 		}
 
+		/* line num decoration */
+//		fl_rectf(3, fl_height() + 8, line_num_width() - 2, h());
+		fl_line(line_num_width(), fl_height() + 8, line_num_width(), h());
 
 		lines_start_y = y() + 8 + (fl_height() * 2 - fl_descent());
 
@@ -162,16 +173,17 @@ protected:
 		if (pad->echo == REGION_RECT)
 		{
 			fl_color(line_color);
-			fl_rectf(x() + 3 + (fl_width(' ') * start_x), lines_start_y + (fl_height() * (start_y - 1)) + fl_descent(), fl_width(' ') * (end_x - start_x), fl_height() * ((end_y - start_y) + 1));
+			fl_rectf(pad_start_x + (fl_width(' ') * start_x), lines_start_y + (fl_height() * (start_y - 1)) + fl_descent(), fl_width(' ') * (end_x - start_x), fl_height() * ((end_y - start_y) + 1));
 		}
 		
 		/* draw the lines of text in the viewport window */
 		yp = lines_start_y;
-		line = LINE_get_line_at (pad, 1 + pad->offset_y);
+		line_num = 1 + pad->offset_y;
+		line = LINE_get_line_at (pad, line_num);
 		if (line == NULL)
 			line = pad->line_head;
 			
-		for (i = 0; i < viewport_h; i++) {
+		for (i = 0; i < viewport_h; i++) {			
 			intab  = 0;
 			
 			if (line == pad->line_head)
@@ -208,39 +220,50 @@ protected:
 							end = line_end;
 						
 						fl_color(line_color);
-						fl_rectf(x() + 3 + (fl_width(' ') * start_x), lines_start_y + (fl_height() * (start_y - 1)) + fl_descent(), fl_width(' ') * (end - start_x), fl_height());
+						fl_rectf(pad_start_x + (fl_width(' ') * start_x), lines_start_y + (fl_height() * (start_y - 1)) + fl_descent(), fl_width(' ') * (end - start_x), fl_height());
 					}
 				} else if (i > start_y && i < end_y) {
 					fl_color(line_color);
-					fl_rectf(x() + 3, lines_start_y + (fl_height() * (i - 1)) + fl_descent(), fl_width(' ') * line_end, fl_height());
+					fl_rectf(pad_start_x, lines_start_y + (fl_height() * (i - 1)) + fl_descent(), fl_width(' ') * line_end, fl_height());
 				} else if (i == end_y && end_x > 0) {
 					end = (line_end < end_x) ? line_end : end_x;
 					fl_color(line_color);
-					fl_rectf(x() + 3, lines_start_y + (fl_height() * (i - 1)) + fl_descent(), fl_width(' ') * end, fl_height());
+					fl_rectf(pad_start_x, lines_start_y + (fl_height() * (i - 1)) + fl_descent(), fl_width(' ') * end, fl_height());
 				}
 			}
 
-			get_string_for_viewport(str, intab, viewport_w, line_buffer);
+			/* draw line number first */
+			if (line != pad->line_head) {
+				fl_font(font, font_size - 2);
+				fl_color(line_num_color);
+				sprintf(line_buffer, "%4d", line_num);
+				fl_draw(line_buffer, 3, yp);
+			}
 
+			/* draw line text */
+			fl_font(font, font_size);
 			fl_color(text_color);
-			fl_draw(line_buffer, x() + 3, yp);
+			get_string_for_viewport(str, intab, viewport_w, line_buffer);
+			fl_draw(line_buffer, pad_start_x, yp);
 			
 			yp += fl_height();
 			
-			if (line != pad->line_head)
+			if (line != pad->line_head) {
 				line = line->next;
+				line_num++;
+			}
 		}
 		
 		/* cursor */
 		if (e->occupied_window == EDIT_WINDOW) {
 			fl_color(line_color);
 			if (pad->echo && !(start_x == end_x && start_y == end_y)) {
-				fl_rect(x() + 3 + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (fl_height() * (pad->curs_y - 2)) + fl_descent(), fl_width(' '), fl_height() );			
+				fl_rect(pad_start_x + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (fl_height() * (pad->curs_y - 2)) + fl_descent(), fl_width(' '), fl_height() );			
 			} else {
-				fl_rectf(x() + 3 + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (fl_height() * (pad->curs_y - 2)) + fl_descent(), fl_width(' '), fl_height() );
+				fl_rectf(pad_start_x + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (fl_height() * (pad->curs_y - 2)) + fl_descent(), fl_width(' '), fl_height() );
 				fl_color(bg_color);
 				sprintf(buf, "%c", pad_get_char_at(pad, pad->curs_x + pad->offset_x, pad->curs_y + pad->offset_y));
-				fl_draw(buf, x() + 3 + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (fl_height() * (pad->curs_y - 1)));
+				fl_draw(buf, pad_start_x + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (fl_height() * (pad->curs_y - 1)));
 			}
 		}
 		
@@ -557,9 +580,10 @@ int main(int argc, char **argv) {
 	add_command ("mouse",  (void (*)())cmd_mouse);
 	add_command ("sic",    (void (*)())cmd_sic);
 
-	bg_color    = fl_rgb_color(254, 255, 231);
-	line_color  = fl_rgb_color(71, 43, 198);
-	text_color  = fl_rgb_color(0, 0, 0);
+	bg_color       = fl_rgb_color(254, 255, 231);
+	line_color     = fl_rgb_color(71, 43, 198);
+	text_color     = fl_rgb_color(0, 0, 0);
+	line_num_color = fl_rgb_color(100, 100, 100);
 
 	Fl::visual(FL_DOUBLE|FL_INDEX);
 
