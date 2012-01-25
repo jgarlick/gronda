@@ -298,7 +298,7 @@ public:
 	void move_cursor(int X, int Y) {
 		int new_x, new_y;
 		
-		new_x = floor((X + 3) / fl_width(' '));
+		new_x = floor((X + 3 - line_num_width()) / fl_width(' '));
 		new_y = floor((Y + 6) / fl_height()) - 1;
 	
 		if (new_x > 0 && new_x <= viewport_w && new_y > 0 && new_y <= viewport_h) {
@@ -312,7 +312,7 @@ public:
 	}
 
 	int in_edit_window(int X, int Y) {
-		return (X > 3 && X < w() - 3 && Y > (6 + fl_height()) && Y < (6 + ((viewport_h + 1) * fl_height()) + fl_descent()));
+		return (X > (3 + line_num_width()) && X < w() - 3 && Y > (6 + fl_height()) && Y < (6 + ((viewport_h + 1) * fl_height()) + fl_descent()));
 	}
 };
 
