@@ -21,6 +21,7 @@
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Box.H>
+#include <FL/fl_ask.H>
 
 #include <FL/names.h>
 
@@ -34,20 +35,17 @@ void display_copy(buffer_t *buf) {
 	}
 }
 
-void display_close ()
-{
+void display_close () {
 }
 
-void display_beep ()
-{
+void display_beep () {
+	fl_beep();
 }
 
-void display_do_menu (menu_t * menu)
-{
+void display_do_menu (menu_t * menu) {
 }
 
-void display_finish_menu ()
-{
+void display_finish_menu () {
 }
 
 Fl_Color bg_color, line_color, text_color, line_num_color;
@@ -178,8 +176,8 @@ protected:
 		}
 
 		/* line num decoration */
-//		fl_rectf(3, fl_height() + 8, line_num_width() - 2, h());
 		if (show_line_numbers) {
+//			fl_rectf(3, fl_height() + 8, line_num_width() - 2, h());
 			fl_line(line_num_width(), fl_height() + 8, line_num_width(), h());
 		}
 
