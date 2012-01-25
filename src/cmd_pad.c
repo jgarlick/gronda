@@ -30,7 +30,9 @@ void cmd_goto_line(int argc, char *argv[]) {
 	if (line_num > pad->line_count) {
 		line_num = pad->line_count;
 	}
-	pad->curs_y = line_num - pad->offset_y;
+	pad->curs_y   = line_num - pad->offset_y;
+	pad->curs_x   = 1;
+	pad->offset_x = 0;
 	move_cursor_into_view(pad);
 
 }
