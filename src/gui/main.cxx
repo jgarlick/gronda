@@ -334,12 +334,10 @@ public:
 };
 
 class InputViewport : public Fl_Widget {
-	int input_start;
 	int viewport_w;
-	char prompt[100];
 protected:
 	void set_viewport_size(int W, int H) {
-		int viewport_w = floor((W - (fl_width(prompt) + 6)) / fl_width(' '));
+		int viewport_w = floor((W - (fl_width(e->cepad->prompt->data) + 6)) / fl_width(' '));
 		pad_set_viewport_size(e->input_pad, viewport_w, 1);
 	}
 
@@ -354,6 +352,7 @@ protected:
 		pad_t  *pad = e->input_pad;
 		char *str;
 		int offset, intab;
+		char *prompt = e->cepad->prompt->data;
 		
 		fl_font(font, font_size);
 		
@@ -383,13 +382,8 @@ protected:
 		}
 	}
 public:
-	void set_prompt(const char *str) {
-		strcpy(prompt, str);
-		input_start = fl_width(prompt);
-	}
     InputViewport(int X, int Y, int W, int H, const char *l=0)
 	: Fl_Widget(X,Y,W,H,l) {
-		set_prompt("Command: ");
 		set_viewport_size(W, H);
 	}
 };

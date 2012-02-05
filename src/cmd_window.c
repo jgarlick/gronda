@@ -17,7 +17,7 @@
 
 #include "editor.h"
 
-void wc_menu_handler (char *text, int index)
+/*void wc_menu_handler (char *text, int index)
 {
 	if (index == 1)
 	{
@@ -26,11 +26,18 @@ void wc_menu_handler (char *text, int index)
 
 	if (index != 3)
 		sig_cleanexit ("%s %s\n", EDITOR_NAME, EDITOR_VERSION);
+}*/
+
+void wc_prompt_callback(char *text) {
+	if(*text && (*text == 'y' || *text == 'Y'))
+		sig_cleanexit ("%s %s\n", EDITOR_NAME, EDITOR_VERSION);
+
+	pad_clear_prompt(e->cepad);
 }
 
 void cmd_wc (int argc, char *argv[])
 {
-	menu_t *m;
+//	menu_t *m;
 	int force_quit = 0;
 	
 	if (argc > 1) {
@@ -44,7 +51,7 @@ void cmd_wc (int argc, char *argv[])
 	if ((e->cpad->flags & MODIFIED) && !force_quit)
 	{
 		/* TODO: use a pre-allocated menu */
-		m = menu_alloc ("File modified; okay to quit?");
+/*		m = menu_alloc ("File modified; okay to quit?");
 
 		menu_add_item (m, "Save and quit",        's', wc_menu_handler);
 		menu_add_item (m, "Quit without saving",  'q', wc_menu_handler);
@@ -52,7 +59,9 @@ void cmd_wc (int argc, char *argv[])
 
 		display_do_menu (m);
 
-		menu_free (m);
+		menu_free (m);*/
+		pad_set_prompt(e->cpad, "File modified; okay to quit? ", wc_prompt_callback);
+		e->occupied_window = COMMAND_WINDOW;
 	}
 	else
 		sig_cleanexit ("%s %s\n", EDITOR_NAME, EDITOR_VERSION);

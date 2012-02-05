@@ -99,6 +99,9 @@ typedef struct pad_s
 
 	regex_t search;
 
+	string_t *prompt;
+	void    (*prompt_callback) ();
+
 	struct pad_s *next;
 }
 pad_t;
@@ -177,6 +180,8 @@ char pad_get_char_at (pad_t *p, int y, int x);
 void pad_modified (pad_t *pad);
 int  pad_pos_x(pad_t *pad);
 int  pad_pos_y(pad_t *pad);
+void pad_set_prompt(pad_t *pad, char *str, void (*callback) ());
+void pad_clear_prompt(pad_t *pad);
 
 /* signals.c */
 void    sig_init (void);

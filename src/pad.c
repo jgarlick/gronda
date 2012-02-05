@@ -35,6 +35,8 @@ pad_t *pad_new()
 	new->width = 10;
 	new->height = 10;
 	
+	new->prompt = string_alloc("Command: ");
+	
 	return new;
 }
 
@@ -131,4 +133,16 @@ int pad_pos_x(pad_t *pad) {
 
 int pad_pos_y(pad_t *pad) {
 	return pad->curs_y + pad->offset_y;
+}
+
+void pad_set_prompt(pad_t *pad, char *str, void (*callback) ()) {
+	string_truncate(pad->prompt, 0);
+	string_append(pad->prompt, str);
+	pad->prompt_callback = callback;
+}
+
+void pad_clear_prompt(pad_t *pad) {
+	string_truncate(pad->prompt, 0);
+	string_append(pad->prompt, "Command: ");
+	pad->prompt_callback = NULL;
 }
