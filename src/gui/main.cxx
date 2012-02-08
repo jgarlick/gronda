@@ -605,7 +605,7 @@ extern "C" void cmd_lineno (int argc, char *argv[])
 int main(int argc, char **argv) {
 	int font_height;
 	int font_width;
-	int io_height;
+	int bottom_bar_height;
 
 	editor_setup(argc, argv);
 	add_command ("mouse",  (void (*)())cmd_mouse);
@@ -643,13 +643,13 @@ int main(int argc, char **argv) {
 	fl_font(font, font_size);
 	font_height = fl_height();
 	font_width  = (int)fl_width(' ');
-	io_height = font_height + 7;
+	bottom_bar_height = font_height + 7;
 
-	edit_viewport = new EditViewport(0, 0, 640, 480 - io_height);
+	edit_viewport = new EditViewport(0, 0, 640, 480 - bottom_bar_height);
 
-	Fl_Group *bottom_section = new Fl_Group(0, 480 - io_height, 640, io_height);
-	input_viewport  = new InputViewport(0, 480 - io_height, 321, io_height);
-	output_viewport = new OutputViewport(319,480 - io_height, 321, io_height);
+	Fl_Group *bottom_section = new Fl_Group(0, 480 - bottom_bar_height, 640, bottom_bar_height);
+	input_viewport  = new InputViewport(0, 480 - bottom_bar_height, 321, bottom_bar_height);
+	output_viewport = new OutputViewport(319,480 - bottom_bar_height, 321, bottom_bar_height);
 	bottom_section->end();
 
 //	window->border(0); /* remove window manager titles and border */
