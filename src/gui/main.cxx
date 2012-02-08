@@ -316,6 +316,11 @@ public:
 
 EditViewport   *edit_viewport;
 
+void close_window(Fl_Widget* win, void* v) {
+	e->cpad = e->cepad;
+	cmd_wc(0, 0);
+	win->redraw();
+}
 
 class MyWindow : public Fl_Double_Window {
 	int handle(int);
@@ -632,6 +637,7 @@ int main(int argc, char **argv) {
 
 //	window->border(0); /* remove window manager titles and border */
 	window->resizable(*edit_viewport);
+	window->callback(close_window);
 	window->show();
 	Fl::focus(window);
 	return(Fl::run());
