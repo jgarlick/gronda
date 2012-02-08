@@ -614,8 +614,13 @@ int main(int argc, char **argv) {
 	add_command ("sic",    (void (*)())cmd_sic);
 	add_command ("lineno", (void (*)())cmd_lineno);
 
+/*  original Apollo Aegis (Domain/OS) colours
 	bg_color       = fl_rgb_color(254, 255, 231);
 	line_color     = fl_rgb_color(71, 43, 198);
+*/
+	bg_color       = fl_rgb_color(255, 255, 246);
+	line_color     = fl_rgb_color(0, 117, 195);
+
 	text_color     = fl_rgb_color(0, 0, 0);
 	line_num_color = fl_rgb_color(100, 100, 100);
 
