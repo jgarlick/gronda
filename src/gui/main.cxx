@@ -560,40 +560,29 @@ int MyWindow::handle(int event) {
 	return (1); // eat all keystrokes
 }
 
-extern "C" void cmd_mouse (int argc, char *argv[])
-{
+extern "C" void cmd_mouse (int argc, char *argv[]) {
 	if (argc > 1)
 	{
 		if (strcmp (argv[1], "-on") == 0)
-		{
 			mouse_to_cursor = 1;
-		}
 		else if (strcmp (argv[1], "-off") == 0)
-		{
 			mouse_to_cursor = 0;
-		}
 	}
 	else
 		mouse_to_cursor = !mouse_to_cursor;
 }
 
-extern "C" void cmd_sic (int argc, char *argv[])
-{
+extern "C" void cmd_sic (int argc, char *argv[]) {
 	edit_viewport->move_cursor(Fl::event_x(), Fl::event_y());
 }
 
-extern "C" void cmd_lineno (int argc, char *argv[])
-{
+extern "C" void cmd_lineno (int argc, char *argv[]) {
 	if (argc > 1)
 	{
 		if (strcmp (argv[1], "-on") == 0)
-		{
 			show_line_numbers = 1;
-		}
 		else if (strcmp (argv[1], "-off") == 0)
-		{
 			show_line_numbers = 0;
-		}
 	}
 	else
 		show_line_numbers = !show_line_numbers;
