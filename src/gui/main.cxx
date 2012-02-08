@@ -48,7 +48,7 @@ void display_do_menu (menu_t * menu) {
 void display_finish_menu () {
 }
 
-Fl_Color bg_color, line_color, text_color, line_num_color;
+Fl_Color bg_color, line_color, text_color, line_num_color, titlebar_color;
 
 #if defined(__APPLE__)
 int font = FL_SCREEN;
@@ -139,14 +139,10 @@ protected:
 		fl_color(bg_color);
 		fl_rectf(x(), y(), w(), h());
 		
-		/* lines at sides */
-		fl_color(line_color);
-		fl_line(x(), y() + 2, x(), h());
-		fl_line(w() - 1, y() + 2, w() - 1, h());
-
 		/* top bar */
-		fl_rectf(x() + 3, y() + 2, w() - 6, fl_height() + 6 );
-
+		fl_color(titlebar_color);
+		fl_rectf(x() + 2, y() + 2, w() - 4, fl_height() + 6 );
+		
 		fl_color(bg_color);
 		fl_draw((pad->filename ? pad->filename : "(new file)"), x() + 7, y() + 5 + fl_height() - fl_descent());
 
@@ -159,7 +155,7 @@ protected:
 		}
 
 		fl_rectf(x() + w() - 113, y() + 4, 19, fl_height() + 2);
-		fl_color(line_color);
+		fl_color(text_color);
 		if (!(pad->flags & FILE_WRITE))
 			sprintf(buf, "R");
 		else if (e->flags & INSERT)
@@ -171,13 +167,13 @@ protected:
 		if (pad->flags & MODIFIED) {
 			fl_color(bg_color);
 			fl_rectf(x() + w() - 77, y() + 4, 19, fl_height() + 2);
-			fl_color(line_color);
+			fl_color(text_color);
 			fl_draw("M", x() + w() - (68 + fl_width(' ') / 2), y() + 5 + fl_height() - fl_descent());
 		}
 
 		/* line num decoration */
 		if (show_line_numbers) {
-//			fl_rectf(3, fl_height() + 8, line_num_width() - 2, h());
+			fl_color(line_color);
 			fl_line(line_num_width(), fl_height() + 8, line_num_width(), h());
 		}
 
@@ -186,7 +182,7 @@ protected:
 		/* rectangular highlight background */
 		if (pad->echo == REGION_RECT)
 		{
-			fl_color(line_color);
+			fl_color(titlebar_color);
 			fl_rectf(pad_start_x + (fl_width(' ') * start_x), lines_start_y + (fl_height() * (start_y - 1)) + fl_descent(), fl_width(' ') * (end_x - start_x), fl_height() * ((end_y - start_y) + 1));
 		}
 		
@@ -221,6 +217,7 @@ protected:
 			}
 			
 			/* linear highlight background for line */
+			fl_color(titlebar_color);
 			if (pad->echo == REGION_LINEAR) {
 				// get the position that the cursor would be in at the end of the line
 				// taking hard tabs into account
@@ -233,22 +230,19 @@ protected:
 						else
 							end = line_end;
 						
-						fl_color(line_color);
 						fl_rectf(pad_start_x + (fl_width(' ') * start_x), lines_start_y + (fl_height() * (start_y - 1)) + fl_descent(), fl_width(' ') * (end - start_x), fl_height());
 					}
 				} else if (i > start_y && i < end_y) {
-					fl_color(line_color);
 					fl_rectf(pad_start_x, lines_start_y + (fl_height() * (i - 1)) + fl_descent(), fl_width(' ') * line_end, fl_height());
 				} else if (i == end_y && end_x > 0) {
 					end = (line_end < end_x) ? line_end : end_x;
-					fl_color(line_color);
 					fl_rectf(pad_start_x, lines_start_y + (fl_height() * (i - 1)) + fl_descent(), fl_width(' ') * end, fl_height());
 				}
 			}
 
 			/* draw line number first */
 			if (show_line_numbers && line != pad->line_head) {
-				fl_font(font, font_size - 2);
+				fl_font(font, font_size - 1);
 				fl_color(line_num_color);
 				sprintf(line_buffer, "%*d", line_num_columns, line_num);
 				fl_draw(line_buffer, 3, yp);
@@ -270,7 +264,7 @@ protected:
 		
 		/* cursor */
 		if (e->occupied_window == EDIT_WINDOW) {
-			fl_color(line_color);
+			fl_color(titlebar_color);
 			if (pad->echo && !(start_x == end_x && start_y == end_y)) {
 				fl_rect(pad_start_x + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (fl_height() * (pad->curs_y - 2)) + fl_descent(), fl_width(' '), fl_height() );			
 			} else {
@@ -364,7 +358,9 @@ protected:
 		fl_color(bg_color);
 		fl_rectf(x(), y(), w(), h());
 		fl_color(line_color);
-		fl_rect(x(), y(), w(), h());
+//		fl_rect(x(), y(), w(), h());
+		fl_line(x(), y(), x() + w(), y());
+		
 		fl_color(text_color);
 		fl_draw(prompt, x() + 3, y() + 4 + fl_height() - fl_descent());
 
@@ -382,7 +378,7 @@ protected:
 
 		if(e->occupied_window == COMMAND_WINDOW) {
 			/* cursor */
-			fl_color(line_color);
+			fl_color(titlebar_color);
 			fl_rectf(x() + 3 + fl_width(prompt) + (fl_width(' ') * (pad->curs_x - 1)), y() + 4, fl_width(' '), fl_height() );
 		}
 	}
@@ -404,7 +400,9 @@ protected:
 		fl_color(bg_color);
 		fl_rectf(x(), y(), w(), h() );
 		fl_color(line_color);
-		fl_rect(x(), y(), w(), h() );
+//		fl_rect(x(), y(), w(), h() );
+		fl_line(x(), y(), x() + w(), y());
+		fl_line(x(), y(), x(), y() + h());
 		
 		line  = e->output_pad->line_head->prev;
 		
@@ -617,9 +615,23 @@ int main(int argc, char **argv) {
 /*  original Apollo Aegis (Domain/OS) colours
 	bg_color       = fl_rgb_color(254, 255, 231);
 	line_color     = fl_rgb_color(71, 43, 198);
+	titlebar_color = line_color;
 */
-	bg_color       = fl_rgb_color(255, 255, 246);
-	line_color     = fl_rgb_color(0, 117, 195);
+	// Apollo Blue
+//	bg_color       = fl_rgb_color(254, 255, 229);
+	titlebar_color = fl_rgb_color(79, 9, 203);
+	// Apollo Red
+//	bg_color       = fl_rgb_color(255, 243, 177);
+//	titlebar_color = fl_rgb_color(231, 0, 0);
+	// Apollo Green
+//	bg_color       = fl_rgb_color(232, 255, 188);
+//	titlebar_color = fl_rgb_color(0, 165, 10);
+
+	bg_color       = fl_rgb_color(254, 255, 234);
+//	titlebar_color = fl_rgb_color(203, 9, 131); // pink
+//	titlebar_color = fl_rgb_color(177, 113, 9); // brown
+//	titlebar_color = fl_rgb_color(9, 178, 148); // teal
+	line_color     = fl_rgb_color(150, 150, 150);
 
 	text_color     = fl_rgb_color(0, 0, 0);
 	line_num_color = fl_rgb_color(100, 100, 100);
@@ -631,7 +643,7 @@ int main(int argc, char **argv) {
 	fl_font(font, font_size);
 	font_height = fl_height();
 	font_width  = (int)fl_width(' ');
-	io_height = font_height + 8;
+	io_height = font_height + 7;
 
 	edit_viewport = new EditViewport(0, 0, 640, 480 - io_height);
 
