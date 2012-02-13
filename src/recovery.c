@@ -29,12 +29,11 @@ sigjmp_buf env;
 
 char    crash_file_name[255] = { 0 };
 
-static void crash_file_handler (char *text, int index)
+static void crash_file_callback (char *text)
 {
-	char *args[2];
 	int  len;
 
-	if (index == 2) /* ignoring crash file */
+	if (*text != 'y') /* ignoring crash file */
 	{
 		/* restore the original file name */
 		len = strlen (crash_file_name);
@@ -43,33 +42,32 @@ static void crash_file_handler (char *text, int index)
 			crash_file_name[len - 4] = '\0';
 	}
 
-	args[0] = "ce";
-	args[1] = crash_file_name;
-	cmd_ce (2, args);
+	pad_read_file(e->cepad, crash_file_name);
  
-	if (index == 1) /* using crash file */
+	if (*text == 'y') /* using crash file */
 	{
 		/* remove the crash file */
 		unlink (crash_file_name);
 
 		/* remove ".CRA" frome the filename */
-		len = strlen (e->cpad->filename);
+		len = strlen (e->cepad->filename);
 
-		if (len > 4 && !strcmp (e->cpad->filename + (len - 4), ".CRA"))
-			e->cpad->filename[len - 4] = '\0';
+		if (len > 4 && !strcmp (e->cepad->filename + (len - 4), ".CRA"))
+			e->cepad->filename[len - 4] = '\0';
 
 		/* set pad to modified */
-		e->cpad->flags |= MODIFIED;
+		e->cepad->flags |= MODIFIED;
 	}
 
 	crash_file_name[0] = '\0';
+	pad_clear_prompt(e->cepad);
 }
 
-int crash_file_check (char *fname)
+int crash_file_check (pad_t *pad, char *fname)
 {
 	struct stat st_buf;
 	FILE        *f;
-	menu_t      *m;
+//	menu_t      *m;
 
 	if (crash_file_name[0] != '\0')
 		return 0;
@@ -85,7 +83,7 @@ int crash_file_check (char *fname)
 		return 0;
 
 	fclose (f);
-
+/*
 	m = menu_alloc ("A crash file exists for file:\n%s", fname);
 	menu_add_item (m, "Use crash file",    'u', crash_file_handler);
 	menu_add_item (m, "Ignore crash file", 'i', crash_file_handler);
@@ -93,6 +91,9 @@ int crash_file_check (char *fname)
 	display_do_menu (m);
 
 	menu_free (m);
+*/
+	pad_set_prompt(pad, "Restore from crash file? (y/n) ", crash_file_callback);
+	e->occupied_window = COMMAND_WINDOW;	
 
 	return 1;
 }

@@ -182,6 +182,7 @@ int  pad_pos_x(pad_t *pad);
 int  pad_pos_y(pad_t *pad);
 void pad_set_prompt(pad_t *pad, char *str, void (*callback) ());
 void pad_clear_prompt(pad_t *pad);
+void pad_read_file(pad_t *pad, char *filename);
 
 /* signals.c */
 void    sig_init (void);
@@ -193,7 +194,7 @@ void    sig_interrupt_handler (int);
 void    sig_handle_error (int);
 
 /* recovery.c */
-int crash_file_check (char *fname);
+int crash_file_check (pad_t *pad, char *fname);
 
 /* buffer.c */
 void get_region (int shape, int *start_y, int *start_x, int *end_y, int *end_x);

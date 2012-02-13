@@ -68,6 +68,7 @@ void parse (const char *format, ...)
 		line = e->input_pad->line_head->prev->prev;
 		if (line != e->input_pad->line_head) {
 			if (e->cepad->prompt_callback) {
+				e->cpad = e->cepad;
 				(e->cepad->prompt_callback) ((line->str && line->str->data) ? line->str->data : &empty_string);
 			} else if(line->str && line->str->data) {
 				parse(line->str->data);

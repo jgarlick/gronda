@@ -13,6 +13,11 @@
  *  authors : James Garlick
  */
 
+#include <errno.h>
+#include <string.h>
+#include <stdio.h>
+#include <unistd.h>
+
 #include "editor.h"
 
 pad_t *pad_new()
@@ -145,4 +150,78 @@ void pad_clear_prompt(pad_t *pad) {
 	string_truncate(pad->prompt, 0);
 	string_append(pad->prompt, "Command: ");
 	pad->prompt_callback = NULL;
+}
+
+void pad_read_file(pad_t *pad, char *filename) {
+	FILE        *f;
+	string_t    *buf;
+	char        tmp[1024];
+	char        *c;
+	char   *args[2];
+
+	f = fopen (filename, "r");
+	if (!f && (errno != ENOENT))
+	{
+		output_message_c (filename, "%s", strerror(errno));
+		return;
+	}
+
+	pad->filename = strdup (filename);
+	e->redraw |= (DIRTY_ALL | TITLE | STATS);
+
+	if (!f)
+		return;
+
+	buf = string_alloc ("");
+
+	while (!feof (f))
+	{
+		if (fgets (tmp, 1024, f) == NULL)
+			continue;
+
+		c = tmp;
+		while (*c != '\n' && *c)
+			c++;
+
+		if (*c == '\n')
+		{
+			*c = 0;
+			string_append (buf, "%s", tmp);
+
+			args[0] = "es";
+			args[1] = buf->data;
+			cmd_es (2, args);
+
+			args[0] = "ad";
+			args[1] = "-s";
+			cmd_ad (2, args);
+			cmd_tl (0, NULL);
+
+			string_truncate (buf, 0);
+		}
+		else
+			string_append (buf, "%s", tmp);
+
+	}
+
+	if (strlen (buf->data) > 0)
+	{
+		args[0] = "es";
+		args[1] = buf->data;
+		cmd_es (2, args);
+	}
+
+	string_free (buf);
+
+	pad->curs_x   = 1;
+	pad->curs_y   = 1;
+	pad->offset_x = 0;
+	pad->offset_y = 0;
+	pad->flags    = 0;
+
+	/* set the read/write / read only mode */
+	if (access (pad->filename, W_OK) != -1)
+		pad->flags |= FILE_WRITE;
+	else
+		pad->flags &= ~FILE_WRITE;
 }

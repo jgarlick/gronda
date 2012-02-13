@@ -24,105 +24,35 @@
 
 #include "editor.h"
 
-#define CE_BUF_SIZE (1024)
-
-
 /* create edit */
 void cmd_ce (int argc, char *argv[])
 {
-	FILE        *f;
-	char        tmp[CE_BUF_SIZE];
-	string_t    *buf;
-	char        *c;
 	struct stat st_buf;
-	char   *args[2];
 	pad_t  *pad;
+	int r;
 
-	if (argc == 1)
-	{
+	if (argc == 1) {
 		output_message_c (argv[0], "Missing File Name");
 		return;
 	}
 
-	if (crash_file_check (argv[1]))
+	r = stat (argv[1], &st_buf);
+	if (r != 0 && errno != ENOENT) {
+		output_message("%s : %s", argv[1], strerror(errno));
 		return;
-
-	stat (argv[1], &st_buf);
+	}
 	if (S_ISDIR (st_buf.st_mode))
 	{
 		output_message ("%s : is a directory", argv[1]);
 		return;
 	}
 
-	f = fopen (argv[1], "r");
-	if (!f && (errno != ENOENT))
-	{
-		output_message_c (argv[0], "%s", strerror(errno));
-		return;
-	}
-
 	pad = pad_add();
 
-	pad->filename = strdup (argv[1]);
-	e->redraw |= (DIRTY_ALL | TITLE | STATS);
-
-	if (!f)
-		return;
-
-	buf = string_alloc ("");
-
-	while (!feof (f))
-	{
-		if (fgets (tmp, CE_BUF_SIZE, f) == NULL)
-			continue;
-
-		c = tmp;
-		while (*c != '\n' && *c)
-			c++;
-
-		if (*c == '\n')
-		{
-			*c = 0;
-			string_append (buf, "%s", tmp);
-
-			args[0] = "es";
-			args[1] = buf->data;
-			cmd_es (2, args);
-
-			args[0] = "ad";
-			args[1] = "-s";
-			cmd_ad (2, args);
-			cmd_tl (0, NULL);
-
-			string_truncate (buf, 0);
-		}
-		else
-			string_append (buf, "%s", tmp);
-
+	if (!crash_file_check (pad, argv[1])) {
+		pad_read_file(pad, argv[1]);
 	}
 
-	if (strlen (buf->data) > 0)
-	{
-		args[0] = "es";
-		args[1] = buf->data;
-		cmd_es (2, args);
-	}
-
-	string_free (buf);
-
-	fclose (f);
-
-	pad->curs_x   = 1;
-	pad->curs_y   = 1;
-	pad->offset_x = 0;
-	pad->offset_y = 0;
-	pad->flags    = 0;
-
-	/* set the read/write / read only mode */
-	if (access (pad->filename, W_OK) != -1)
-		pad->flags |= FILE_WRITE;
-	else
-		pad->flags &= ~FILE_WRITE;
 }
 
 /* pad write */
