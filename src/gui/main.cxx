@@ -601,26 +601,24 @@ int main(int argc, char **argv) {
 	add_command ("sic",    (void (*)())cmd_sic);
 	add_command ("lineno", (void (*)())cmd_lineno);
 
-/*  original Apollo Aegis (Domain/OS) colours
-	bg_color       = fl_rgb_color(254, 255, 231);
-	line_color     = fl_rgb_color(71, 43, 198);
-	titlebar_color = line_color;
-*/
-	// Apollo Blue
-//	bg_color       = fl_rgb_color(254, 255, 229);
-	titlebar_color = fl_rgb_color(79, 9, 203);
-	// Apollo Red
-//	bg_color       = fl_rgb_color(255, 243, 177);
-//	titlebar_color = fl_rgb_color(231, 0, 0);
-	// Apollo Green
-//	bg_color       = fl_rgb_color(232, 255, 188);
-//	titlebar_color = fl_rgb_color(0, 165, 10);
+	// Aegis Blue
+	bg_color       = fl_rgb_color(255, 255, 230);
+	titlebar_color = fl_rgb_color(60, 60, 200);
+	// Aegis Red
+//	bg_color       = fl_rgb_color(255, 240, 180);
+//	titlebar_color = fl_rgb_color(210, 20, 0);
+	// Aegis Green
+//	bg_color       = fl_rgb_color(240, 255, 190);
+//	titlebar_color = fl_rgb_color(30, 155, 0);
+	// Aegis Brown
+//	bg_color       = fl_rgb_color(240, 240, 170);
+//	titlebar_color = fl_rgb_color(150, 90, 0);
 
-	bg_color       = fl_rgb_color(254, 255, 234);
 //	titlebar_color = fl_rgb_color(203, 9, 131); // pink
-//	titlebar_color = fl_rgb_color(177, 113, 9); // brown
 //	titlebar_color = fl_rgb_color(9, 178, 148); // teal
-	line_color     = fl_rgb_color(150, 150, 150);
+
+//	line_color     = fl_rgb_color(150, 150, 150);
+	line_color = titlebar_color;
 
 	text_color     = fl_rgb_color(0, 0, 0);
 	line_num_color = fl_rgb_color(100, 100, 100);
