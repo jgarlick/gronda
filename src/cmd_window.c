@@ -28,9 +28,11 @@
 		sig_cleanexit ("%s %s\n", EDITOR_NAME, EDITOR_VERSION);
 }*/
 
+#define EXIT_TEXT "\n%s  Version %s\n", EDITOR_NAME, EDITOR_VERSION
+
 void wc_prompt_callback(char *text) {
 	if(*text && (*text == 'y' || *text == 'Y'))
-		sig_cleanexit ("%s %s\n", EDITOR_NAME, EDITOR_VERSION);
+		sig_cleanexit (EXIT_TEXT);
 
 	pad_clear_prompt(e->cepad);
 }
@@ -64,7 +66,7 @@ void cmd_wc (int argc, char *argv[])
 		e->occupied_window = COMMAND_WINDOW;
 	}
 	else
-		sig_cleanexit ("%s %s\n", EDITOR_NAME, EDITOR_VERSION);
+		sig_cleanexit (EXIT_TEXT);
 }
 
 void cmd_tdm (int argc, char *argv[])

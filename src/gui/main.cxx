@@ -144,7 +144,7 @@ protected:
 		fl_rectf(x() + 2, y() + 2, w() - 4, fl_height() + 6 );
 		
 		fl_color(bg_color);
-		fl_draw((pad->filename ? pad->filename : "(new file)"), x() + 7, y() + 5 + fl_height() - fl_descent());
+		fl_draw((pad->filename ? pad->filename : "pad0001"), x() + 7, y() + 5 + fl_height() - fl_descent());
 
 		sprintf(buf, "%d", pad->offset_y + 1);
 		fl_draw(buf, x() + w() - (7 + fl_width(' ') * strlen(buf)), y() + 5 + fl_height() - fl_descent());
