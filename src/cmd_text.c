@@ -62,7 +62,7 @@ void cmd_es (int argc, char *argv[])
 /*	string_debug (cline->str);*/
 
 	/* horizontal cursor movement */
-	pad->curs_x = get_curs_pos ((xpos - pad->offset_x) + strlen (argv[1]), cline);
+	pad->curs_x = get_curs_pos (xpos + strlen (argv[1]), cline) - pad->offset_x;
 
 	while (pad->curs_x > pad->width)
 	{
