@@ -393,6 +393,7 @@ void cursor_set_pos (pad_t *p, int curs_y, int curs_x, int adjust)
 void move_cursor_into_view(pad_t *pad) {
 	if (pad->curs_y < 1) {
 		pad->offset_y += (pad->curs_y - 1);
+		if(pad->offset_y < 0) pad->offset_y = 0;
 		pad->curs_y = 1;
 	} else if (pad->curs_y > pad->height) {
 		pad->offset_y += (pad->curs_y - pad->height);
@@ -401,6 +402,7 @@ void move_cursor_into_view(pad_t *pad) {
 
 	if (pad->curs_x < 1) {
 		pad->offset_x += (pad->curs_x - 1);
+		if(pad->offset_x < 0) pad->offset_x = 0;
 		pad->curs_x = 1;
 	} else if (pad->curs_x > pad->width) {
 		pad->offset_x += (pad->curs_x - pad->width);

@@ -140,6 +140,12 @@ int pad_pos_y(pad_t *pad) {
 	return pad->curs_y + pad->offset_y;
 }
 
+/* move the cursor to an absolute position in the pad and scroll into view if needed */
+void pad_goto(pad_t *pad, int row, int col, int adjust) {
+	cursor_set_pos(pad, row - pad->offset_y, col - pad->offset_x, adjust);
+	move_cursor_into_view(pad);
+}
+
 void pad_set_prompt(pad_t *pad, char *str, void (*callback) ()) {
 	string_truncate(pad->prompt, 0);
 	string_append(pad->prompt, str);

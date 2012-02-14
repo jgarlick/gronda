@@ -234,6 +234,7 @@ void cmd_ee (int argc, char *argv[])
 {
 	pad_t  *pad = e->cpad;
 	int wordwrap = 0;
+	int pos_x, pos_y;
 
 	if (!(e->cpad->flags & FILE_WRITE))
 	{
@@ -244,11 +245,23 @@ void cmd_ee (int argc, char *argv[])
 	if (argc > 1 && strcmp (argv[1], "-w") == 0)
 		wordwrap = 1;
 
-	if ((pad->curs_x + pad->offset_x) == 1 
-		&& (!wordwrap || (pad->curs_y + pad->offset_y == 1)))
+	/* hack to stop ee -w working in the input pad */
+	/* remove once local key definitions are implemented */
+	if(e->cpad == e->input_pad) wordwrap = 0;
+
+	pos_x = pad_pos_x(pad);
+	pos_y = pad_pos_y(pad);
+
+	if (pos_x == 1 && (!wordwrap || (pos_y == 1)))
 		return;
 
-	cmd_al (argc, argv);
+	if(pos_x > 1) {
+		pad_goto(pad, pos_y, pos_x - 1, ADJUST_LEFT);
+	} else {
+		pad_goto(pad, pos_y - 1, pos_x, ADJUST_LEFT);
+		cmd_tr(0, NULL);
+	}
+
 	cmd_ed (0, NULL);
 }
 

@@ -183,6 +183,7 @@ int  pad_pos_y(pad_t *pad);
 void pad_set_prompt(pad_t *pad, char *str, void (*callback) ());
 void pad_clear_prompt(pad_t *pad);
 void pad_read_file(pad_t *pad, char *filename);
+void pad_goto(pad_t *pad, int row, int col, int adjust);
 
 /* signals.c */
 void    sig_init (void);

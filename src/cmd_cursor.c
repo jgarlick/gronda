@@ -179,16 +179,17 @@ void cmd_tr (int argc, char *argv[])
 
 void cmd_goto (int argc, char *argv[])
 {
-	int line = e->cpad->offset_y + e->cpad->curs_y;
-	int col  = e->cpad->offset_x + e->cpad->curs_x;
+	pad_t *pad = e->cepad;
+	int row = pad_pos_y(pad);
+	int col = pad_pos_x(pad);
 	
 	if (argc > 1 && strlen(argv[1]) > 0) {
 		if (argv[1][0] == '+')
-			line += atoi(argv[1] + 1);
+			row += atoi(argv[1] + 1);
 		else if (argv[1][0] == '-')
-			line -= atoi(argv[1] + 1);
+			row -= atoi(argv[1] + 1);
 		else
-			line = atoi(argv[1]);
+			row = atoi(argv[1]);
 	}
 	if (argc > 2 && strlen(argv[2]) > 0) {
 		if (argv[2][0] == '+')
@@ -198,8 +199,5 @@ void cmd_goto (int argc, char *argv[])
 		else
 			col = atoi(argv[2]);
 	}
-	line = line - e->cpad->offset_y;
-	col  = col  - e->cpad->offset_x;
-	cursor_set_pos (e->cpad, line, col, ADJUST_RIGHT);
-	move_cursor_into_view(e->cpad);
+	pad_goto(pad, row, col, ADJUST_RIGHT);
 }
