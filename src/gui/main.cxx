@@ -336,7 +336,7 @@ class InputViewport : public Fl_Widget {
 	int viewport_w;
 protected:
 	void set_viewport_size(int W, int H) {
-		int viewport_w = floor((W - (fl_width(e->cepad->prompt->data) + 6)) / fl_width(' '));
+		viewport_w = floor((W - (fl_width(e->cepad->prompt->data) + 6)) / fl_width(' '));
 		pad_set_viewport_size(e->input_pad, viewport_w, 1);
 	}
 
@@ -346,7 +346,7 @@ protected:
 	}
 	
 	void draw() {
-		char buf[80];
+		char buffer[512];
 		line_t *line;
 		pad_t  *pad = e->input_pad;
 		char *str;
@@ -367,13 +367,17 @@ protected:
 		line = pad->line_head->prev;
 		if (line != pad->line_head && line->str && line->str->data) {
 			offset = get_string_pos (pad->offset_x + 1, line->str->data, &intab);
+			if (intab) offset++;
+
 			if ((size_t)offset < strlen (line->str->data))
 				str = line->str->data + offset;
 			else
 				str = NULL;
 
-			if (str)
-				fl_draw(str, x() + 3 + fl_width(prompt), y() + 4 + fl_height() - fl_descent());
+			if (str) {
+				get_string_for_viewport(str, intab, viewport_w, buffer);
+				fl_draw(buffer, x() + 3 + fl_width(prompt), y() + 4 + fl_height() - fl_descent());
+			}
 		}
 
 		if(e->occupied_window == COMMAND_WINDOW) {
