@@ -178,11 +178,16 @@ kd{ws}[^[:blank:]]+{ws} {
 }
 
 [/\\] {
-	BEGIN SEARCH;
+	if(i > 0) {
+		yymore();
+		REJECT;
+	} else {
+		BEGIN SEARCH;
 
-	buf = string_alloc("");
-	quote_delimiter = *yytext;
-	debug("SEARCH start %c", quote_delimiter);
+		buf = string_alloc("");
+		quote_delimiter = *yytext;
+		debug("SEARCH start %c", quote_delimiter);
+	}
 }
 
 <SEARCH>[\\][\\/] {

@@ -355,7 +355,8 @@ static void yy_fatal_error (yyconst char msg[]  );
  */
 #define YY_DO_BEFORE_ACTION \
 	(yytext_ptr) = yy_bp; \
-	yyleng = (size_t) (yy_cp - yy_bp); \
+	(yytext_ptr) -= (yy_more_len); \
+	yyleng = (size_t) (yy_cp - (yytext_ptr)); \
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
@@ -369,14 +370,27 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static yyconst flex_int16_t yy_accept[60] =
+static yyconst flex_int16_t yy_acclist[84] =
     {   0,
-        0,    0,    0,    0,    0,    0,    0,    0,   24,   22,
-       12,   21,   18,    4,   19,   22,   19,   19,   14,   20,
-       21,   22,   14,   19,   11,   10,    9,   11,    3,    3,
-       23,   17,   16,   16,   12,   19,    0,   20,   19,   19,
-       19,    0,    0,   19,    8,    7,    5,    6,    0,    0,
-       15,   20,    0,   13,    0,    2,    0,    1,    0
+       24,   22,   23,   12,   22,   23,   21,   23,   18,   22,
+       23,    4,   22,   23,   19,   22,   23,   22,   23,   19,
+       22,   23,   19,   22,   23,   14,   22,   23,   20,   22,
+       23,   21,   22,   23,   22,   23,   14,   18,   22,   23,
+       19,   22,   23,   11,   23,   10,   23,    9,   11,   23,
+       11,   23,    3,   23,    3,   23,   23,   17,   23,   16,
+       17,   23,   16,   17,   23,   12,   19,   20,   19,   19,
+       20,   19,   20,   19,    8,    7,    5,    6,   15,   20,
+       13,    2,    1
+    } ;
+
+static yyconst flex_int16_t yy_accept[61] =
+    {   0,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    2,
+        4,    7,    9,   12,   15,   18,   20,   23,   26,   29,
+       32,   35,   37,   41,   44,   46,   48,   51,   53,   55,
+       57,   58,   60,   63,   66,   67,   68,   68,   69,   70,
+       72,   74,   74,   74,   75,   76,   77,   78,   79,   79,
+       79,   80,   81,   81,   82,   82,   83,   83,   84,   84
     } ;
 
 static yyconst flex_int32_t yy_ec[256] =
@@ -478,18 +492,24 @@ static yyconst flex_int16_t yy_chk[141] =
        59,   59,   59,   59,   59,   59,   59,   59,   59,   59
     } ;
 
-static yy_state_type yy_last_accepting_state;
-static char *yy_last_accepting_cpos;
-
 extern int yy_flex_debug;
 int yy_flex_debug = 0;
 
-/* The intent behind this definition is that it'll catch
- * any uses of REJECT which flex missed.
- */
-#define REJECT reject_used_but_not_detected
-#define yymore() yymore_used_but_not_detected
-#define YY_MORE_ADJ 0
+static yy_state_type *yy_state_buf=0, *yy_state_ptr=0;
+static char *yy_full_match;
+static int yy_lp;
+#define REJECT \
+{ \
+*yy_cp = (yy_hold_char); /* undo effects of setting up yytext */ \
+yy_cp = (yy_full_match); /* restore poss. backed-over text */ \
+++(yy_lp); \
+goto find_rule; \
+}
+
+static int yy_more_flag = 0;
+static int yy_more_len = 0;
+#define yymore() ((yy_more_flag) = 1)
+#define YY_MORE_ADJ (yy_more_len)
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
 #line 1 "gce.lex"
@@ -555,7 +575,7 @@ char *yytext;
 
 
 
-#line 559 "../lex.c"
+#line 579 "../lex.c"
 
 #define INITIAL 0
 #define STRING 1
@@ -744,7 +764,7 @@ YY_DECL
 
 	word = string_alloc("");
 	
-#line 748 "../lex.c"
+#line 768 "../lex.c"
 
 	if ( !(yy_init) )
 		{
@@ -753,6 +773,12 @@ YY_DECL
 #ifdef YY_USER_INIT
 		YY_USER_INIT;
 #endif
+
+        /* Create the reject buffer large enough to save one state per allowed character. */
+        if ( ! (yy_state_buf) )
+            (yy_state_buf) = (yy_state_type *)yyalloc(YY_STATE_BUF_SIZE  );
+            if ( ! (yy_state_buf) )
+                YY_FATAL_ERROR( "out of dynamic memory in yylex()" );
 
 		if ( ! (yy_start) )
 			(yy_start) = 1;	/* first start state */
@@ -774,6 +800,12 @@ YY_DECL
 
 	while ( 1 )		/* loops until end-of-file is reached */
 		{
+		(yy_more_len) = 0;
+		if ( (yy_more_flag) )
+			{
+			(yy_more_len) = (yy_c_buf_p) - (yytext_ptr);
+			(yy_more_flag) = 0;
+			}
 		yy_cp = (yy_c_buf_p);
 
 		/* Support of yytext. */
@@ -785,15 +817,14 @@ YY_DECL
 		yy_bp = yy_cp;
 
 		yy_current_state = (yy_start);
+
+		(yy_state_ptr) = (yy_state_buf);
+		*(yy_state_ptr)++ = yy_current_state;
+
 yy_match:
 		do
 			{
 			register YY_CHAR yy_c = yy_ec[YY_SC_TO_UI(*yy_cp)];
-			if ( yy_accept[yy_current_state] )
-				{
-				(yy_last_accepting_state) = yy_current_state;
-				(yy_last_accepting_cpos) = yy_cp;
-				}
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
@@ -801,17 +832,29 @@ yy_match:
 					yy_c = yy_meta[(unsigned int) yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
+			*(yy_state_ptr)++ = yy_current_state;
 			++yy_cp;
 			}
 		while ( yy_base[yy_current_state] != 115 );
 
 yy_find_action:
-		yy_act = yy_accept[yy_current_state];
-		if ( yy_act == 0 )
-			{ /* have to back up */
-			yy_cp = (yy_last_accepting_cpos);
-			yy_current_state = (yy_last_accepting_state);
-			yy_act = yy_accept[yy_current_state];
+		yy_current_state = *--(yy_state_ptr);
+		(yy_lp) = yy_accept[yy_current_state];
+goto find_rule; /* Shut up GCC warning -Wall */
+find_rule: /* we branch to this label when backing up */
+		for ( ; ; ) /* until we find what rule we matched */
+			{
+			if ( (yy_lp) && (yy_lp) < yy_accept[yy_current_state + 1] )
+				{
+				yy_act = yy_acclist[(yy_lp)];
+					{
+					(yy_full_match) = yy_cp;
+					break;
+					}
+				}
+			--yy_cp;
+			yy_current_state = *--(yy_state_ptr);
+			(yy_lp) = yy_accept[yy_current_state];
 			}
 
 		YY_DO_BEFORE_ACTION;
@@ -820,13 +863,6 @@ do_action:	/* This label is used only to access EOF actions. */
 
 		switch ( yy_act )
 	{ /* beginning of action switch */
-			case 0: /* must back up */
-			/* undo the effects of YY_DO_BEFORE_ACTION */
-			*yy_cp = (yy_hold_char);
-			yy_cp = (yy_last_accepting_cpos);
-			yy_current_state = (yy_last_accepting_state);
-			goto yy_find_action;
-
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
@@ -985,23 +1021,28 @@ case 14:
 YY_RULE_SETUP
 #line 180 "gce.lex"
 {
-	BEGIN SEARCH;
+	if(i > 0) {
+		yymore();
+		REJECT;
+	} else {
+		BEGIN SEARCH;
 
-	buf = string_alloc("");
-	quote_delimiter = *yytext;
-	debug("SEARCH start %c", quote_delimiter);
+		buf = string_alloc("");
+		quote_delimiter = *yytext;
+		debug("SEARCH start %c", quote_delimiter);
+	}
 }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 188 "gce.lex"
+#line 193 "gce.lex"
 {
 	string_append(buf, "%c", *yytext);
 }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 192 "gce.lex"
+#line 197 "gce.lex"
 {
 	if (*yytext == quote_delimiter)
 		execute_search();
@@ -1011,20 +1052,20 @@ YY_RULE_SETUP
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 198 "gce.lex"
+#line 203 "gce.lex"
 {
 	string_append(buf, "%c", *yytext);
 }
 	YY_BREAK
 case YY_STATE_EOF(SEARCH):
-#line 202 "gce.lex"
+#line 207 "gce.lex"
 {
 	execute_search();
 }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 206 "gce.lex"
+#line 211 "gce.lex"
 {
 	token_buf[0] = *yytext;
 	token_buf[1] = '\0';
@@ -1034,7 +1075,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 213 "gce.lex"
+#line 218 "gce.lex"
 {
 		debug("found word %s", yytext);
 		add_arg(yytext);
@@ -1042,14 +1083,14 @@ YY_RULE_SETUP
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 217 "gce.lex"
+#line 222 "gce.lex"
 {
 		debug("found num %s", yytext);
 		add_arg(yytext);
 	}
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 223 "gce.lex"
+#line 228 "gce.lex"
 {
 			execute_and_reset();
 			yyterminate();
@@ -1058,24 +1099,24 @@ case YY_STATE_EOF(INITIAL):
 case 21:
 /* rule 21 can match eol */
 YY_RULE_SETUP
-#line 227 "gce.lex"
+#line 232 "gce.lex"
 {
 			execute_and_reset();
 		}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 230 "gce.lex"
+#line 235 "gce.lex"
 {
 		debug (" [lex] *** Unexpected character! ***");
 		}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 234 "gce.lex"
+#line 239 "gce.lex"
 ECHO;
 	YY_BREAK
-#line 1079 "../lex.c"
+#line 1120 "../lex.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1265,37 +1306,8 @@ static int yy_get_next_buffer (void)
 		while ( num_to_read <= 0 )
 			{ /* Not enough room in the buffer - grow it. */
 
-			/* just a shorter name for the current buffer */
-			YY_BUFFER_STATE b = YY_CURRENT_BUFFER;
-
-			int yy_c_buf_p_offset =
-				(int) ((yy_c_buf_p) - b->yy_ch_buf);
-
-			if ( b->yy_is_our_buffer )
-				{
-				yy_size_t new_size = b->yy_buf_size * 2;
-
-				if ( new_size <= 0 )
-					b->yy_buf_size += b->yy_buf_size / 8;
-				else
-					b->yy_buf_size *= 2;
-
-				b->yy_ch_buf = (char *)
-					/* Include room in for 2 EOB chars. */
-					yyrealloc((void *) b->yy_ch_buf,b->yy_buf_size + 2  );
-				}
-			else
-				/* Can't grow it, we don't own it. */
-				b->yy_ch_buf = 0;
-
-			if ( ! b->yy_ch_buf )
-				YY_FATAL_ERROR(
-				"fatal error - scanner input buffer overflow" );
-
-			(yy_c_buf_p) = &b->yy_ch_buf[yy_c_buf_p_offset];
-
-			num_to_read = YY_CURRENT_BUFFER_LVALUE->yy_buf_size -
-						number_to_move - 1;
+			YY_FATAL_ERROR(
+"input buffer overflow, can't enlarge buffer because scanner uses REJECT" );
 
 			}
 
@@ -1354,14 +1366,12 @@ static int yy_get_next_buffer (void)
     
 	yy_current_state = (yy_start);
 
+	(yy_state_ptr) = (yy_state_buf);
+	*(yy_state_ptr)++ = yy_current_state;
+
 	for ( yy_cp = (yytext_ptr) + YY_MORE_ADJ; yy_cp < (yy_c_buf_p); ++yy_cp )
 		{
 		register YY_CHAR yy_c = (*yy_cp ? yy_ec[YY_SC_TO_UI(*yy_cp)] : 1);
-		if ( yy_accept[yy_current_state] )
-			{
-			(yy_last_accepting_state) = yy_current_state;
-			(yy_last_accepting_cpos) = yy_cp;
-			}
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
@@ -1369,6 +1379,7 @@ static int yy_get_next_buffer (void)
 				yy_c = yy_meta[(unsigned int) yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
+		*(yy_state_ptr)++ = yy_current_state;
 		}
 
 	return yy_current_state;
@@ -1382,14 +1393,8 @@ static int yy_get_next_buffer (void)
     static yy_state_type yy_try_NUL_trans  (yy_state_type yy_current_state )
 {
 	register int yy_is_jam;
-    	register char *yy_cp = (yy_c_buf_p);
-
+    
 	register YY_CHAR yy_c = 1;
-	if ( yy_accept[yy_current_state] )
-		{
-		(yy_last_accepting_state) = yy_current_state;
-		(yy_last_accepting_cpos) = yy_cp;
-		}
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
@@ -1398,6 +1403,8 @@ static int yy_get_next_buffer (void)
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 	yy_is_jam = (yy_current_state == 59);
+	if ( ! yy_is_jam )
+		*(yy_state_ptr)++ = yy_current_state;
 
 	return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1985,6 +1992,11 @@ static int yy_init_globals (void)
     (yy_init) = 0;
     (yy_start) = 0;
 
+    (yy_state_buf) = 0;
+    (yy_state_ptr) = 0;
+    (yy_full_match) = 0;
+    (yy_lp) = 0;
+
 /* Defined in main.c */
 #ifdef YY_STDINIT
     yyin = stdin;
@@ -2014,6 +2026,9 @@ int yylex_destroy  (void)
 	/* Destroy the stack itself. */
 	yyfree((yy_buffer_stack) );
 	(yy_buffer_stack) = NULL;
+
+    yyfree ( (yy_state_buf) );
+    (yy_state_buf)  = NULL;
 
     /* Reset the globals. This is important in a non-reentrant scanner so the next time
      * yylex() is called, initialization will occur. */
@@ -2070,7 +2085,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 234 "gce.lex"
+#line 239 "gce.lex"
 
 
 	
