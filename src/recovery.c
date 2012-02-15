@@ -98,46 +98,45 @@ int crash_file_check (pad_t *pad, char *fname)
 	return 1;
 }
 
-/* attempt to write a crash file */
+/* attempt to write a crash file(s) */
 static void crash_file_write ()
 {
 	char    fname[255];
 	FILE    *f;
 	int     a;
 	line_t  *mover;
+	pad_t *pad;
 
-	if (e && e->cpad 
-		&& e->cpad->line_head 
-		&& e->cpad->filename
-		&& (e->cpad->line_count > 0)
-		&& (e->cpad->flags & MODIFIED))
-	{
-		sprintf (fname, "%s.CRA", e->cpad->filename);
+	if (e) {
+		pad = e->pad_head;
+		
+		while(pad) {
+			if(pad->line_head && pad->filename && pad->line_count > 0 && pad->flags & MODIFIED) {
+				sprintf (fname, "%s.CRA", pad->filename);
 
-		f = fopen (fname, "w");
-		if (f)
-		{
-			mover = e->cpad->line_head->next;
+				f = fopen (fname, "w");
+				if (f) {
+					mover = pad->line_head->next;
 
-			for (a = 0; a < e->cpad->line_count; a++)
-			{
-				if (mover && mover != e->cpad->line_head)
-				{
-					if (mover->str != NULL)
-						fputs (mover->str->data, f);
+					for (a = 0; a < pad->line_count; a++) {
+						if (mover && mover != pad->line_head) {
+							if (mover->str != NULL)
+								fputs (mover->str->data, f);
+							fputc ('\n', f);
 
-					fputc ('\n', f);
+							mover = mover->next;
+						}
+					}
+					fclose (f);
 
-					mover = mover->next;
+					printf ("\n** Crash file '%s' written! **\n", fname);
+				}
+				else {
+					printf ("\n** Error opening crash file '%s'! **\n", fname);
 				}
 			}
-
-			fclose (f);
-
-			printf ("\n** Crash file written! **\n");
+			pad = pad->next;
 		}
-		else
-			printf ("\n** Error opening crash file! **\n");
 	}
 }
 
