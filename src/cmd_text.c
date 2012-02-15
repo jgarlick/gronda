@@ -195,21 +195,16 @@ void cmd_ed (int argc, char *argv[])
 
 	cline = LINE_get_line_at (pad, ypos);
 
-	len = 0;
+	len = xpos = 0;
 
-	if (cline->str != NULL)
-	{
+	if (cline->str) {
 		xpos = get_string_pos (pad->curs_x + pad->offset_x, cline->str->data, &intab);
-
-		len = strlen (cline->str->data);
+		len  = strlen (cline->str->data);
 	}
 
-	if (xpos < len)
-	{
+	if (xpos < len) {
 		string_remove (cline->str, xpos, 1);
-	}
-	else
-	{
+	} else {
 		cline2 = LINE_get_line_at (pad, ypos + 1);
 		if (cline2 != NULL)
 		{
