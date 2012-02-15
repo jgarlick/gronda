@@ -47,6 +47,8 @@ void cmd_au (int argc, char *argv[])
 		else
 			display_beep ();
 	}
+	/* hard tabs can move the cursor out of the viewport */
+	move_cursor_into_view(e->cpad);
 }
 
 void cmd_ad (int argc, char *argv[])
@@ -80,6 +82,8 @@ void cmd_ad (int argc, char *argv[])
 		else
 			display_beep ();
 	}
+	/* hard tabs can move the cursor out of the viewport */
+	move_cursor_into_view(e->cpad);
 }
 
 void cmd_al (int argc, char *argv[])
@@ -101,6 +105,8 @@ void cmd_al (int argc, char *argv[])
 	}
 
 	cursor_set_pos (p, p->curs_y, p->curs_x - 1, ADJUST_LEFT);
+	/* hard tabs can move the cursor out of the viewport */
+	move_cursor_into_view(p);
 }
 
 void cmd_ar (int argc, char *argv[])
@@ -128,6 +134,9 @@ void cmd_ar (int argc, char *argv[])
 
 	if (p->curs_x < p->width)
 		cursor_set_pos (p, p->curs_y, p->curs_x + 1, ADJUST_RIGHT);
+		
+	/* hard tabs can move the cursor out of the viewport */
+	move_cursor_into_view(p);
 }
 
 void cmd_tt (int argc, char *argv[])
