@@ -136,10 +136,12 @@ buffer_t *buffer_create (char *name)
 	return buf;
 }
 
+#define MAX_BUF (32768)
+
 void buffer_cutcopy (buffer_t *buf, int cut, int shape, int start_y, int start_x, int end_y, int end_x)
 {
-	static char temp[4096];
-	int     a, b;
+	static char temp[MAX_BUF];
+	int     a, b, terminator;
 	int     diff;
 	line_t *l;
 	line_t *next;
@@ -179,8 +181,10 @@ void buffer_cutcopy (buffer_t *buf, int cut, int shape, int start_y, int start_x
 			{
 				end = get_string_pos (end_x - (a == start_y ? start_x : 1), s, &intab);
 					
-				strcpy (temp, s);
-				temp[end + 1] = '\0';
+				strncpy (temp, s, MAX_BUF);
+				terminator = end + 1;
+				if(terminator >= MAX_BUF) terminator = MAX_BUF - 1;
+				temp[terminator] = '\0';
 
 				s = temp;
 			}
@@ -229,16 +233,18 @@ void buffer_cutcopy (buffer_t *buf, int cut, int shape, int start_y, int start_x
 			end   = get_string_pos (end_x,   s, &intab);
 
 			len = end - start;
+			terminator = len;
+			if(terminator >= MAX_BUF) terminator = MAX_BUF - 1;
 			if ((size_t)start <= strlen (s)) {
 				s += start;
-				strncpy (temp, s, len);
+				strncpy (temp, s, terminator);
 			}
-			temp[len] = '\0';
+			temp[terminator] = '\0';
 
 			copied_len = strlen (temp);
 			diff       = len - copied_len;
 
-			for (b = 0; b < diff; b++)
+			for (b = 0; b < diff && ((copied_len + b) < MAX_BUF); b++)
 				temp[copied_len + b] = ' ';
 
 			if (a != end_y)
@@ -254,7 +260,7 @@ void buffer_cutcopy (buffer_t *buf, int cut, int shape, int start_y, int start_x
 
 		l = next;
 	}
-	
+
 	if (modified)
 		pad_modified (e->cpad);
 }
