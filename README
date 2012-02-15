@@ -1,5 +1,5 @@
-    Gronda Text Editor
-    Copyright  James Garlick, Graeme Jefferis, 2002 - 2012 
+Gronda Text Editor
+Copyright  James Garlick, Graeme Jefferis, 2002 - 2012
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of version 2 of the GNU General Public License as 
@@ -10,11 +10,56 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    Gronda is a text editor inspired by the AEGIS Display Manager editor 
-    found on Apollo/Domain workstations. 
+    Gronda is a text editor inspired by the Aegis Display Manager editor 
+    found on Apollo workstations. 
 
-    System Requirements:
+SYSTEM REQUIREMENTS
 
     Unix/Linux or Mac OS X
     FLTK 1.3 for the graphical interface
     ncurses for the terminal interface (currently not working)
+
+COMMANDS
+
+!            Bang
+"num"        Go to line number "num"
+=            Position
+[row,col]    Go to row and column
+//           Forward Search
+ad           Arrow Down
+al           Arrow Left
+ar           Arrow Right
+au           Arrow Up
+ce           Create Edit
+dr           Define Region
+echo         Highlight Text (-r for rectangular)
+ed           Delete Character
+ee           Edit Erase
+ei           Insert/Overstrike
+en           Enter Newline
+er           Enter Raw
+es           Enter String
+kd           Key Definition
+lineno       Line numbers on/off
+mouse        Mouse to Text Cursor on/off
+msg          Message to output window
+pb           Pad Bottom
+ph           Pad Horizontal
+pn           Pad Name
+pp           Pad Page
+pt           Pad Top
+pv           Pad Vertical
+pw           Pad Write
+pwd          Print Working Directory
+ro           Read Only
+sic          Set Insert Cursor
+tb           To Bottom
+tdm          To DM
+tl           To Left
+tn           To Next Pad
+tr           To Right
+tt           To Top
+wc           Window Close
+xc           Copy (-r for rectangular)
+xd           Cut (-r for rectangular)
+xp           Paste (-r for rectangular)
