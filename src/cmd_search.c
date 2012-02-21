@@ -13,6 +13,7 @@
  *  purpose : Search and replace commands
  *  authors : James Garlick
  */
+#include <string.h>
 
 #include "editor.h"
 
@@ -23,13 +24,11 @@ void cmd_search (int argc, char *argv[])
 	regmatch_t matchptr[10];
 	int flags;
 	int r;
-	int start_x, y, intab;
-	char *ptr;
+	int start_x, y, intab, line_len;
+	const char *ptr;
 	char buf[255];
 
 	if(argc > 1) {
-//		debug("searching for %s", argv[1]);
-	
 		regfree(&(pad->search));
 	
 		r = regcomp(&(pad->search), argv[1], REG_EXTENDED);
@@ -42,29 +41,29 @@ void cmd_search (int argc, char *argv[])
 	r = REG_NOMATCH;
 	y = pad_pos_y(pad);
 	start_x = pad_pos_x(pad) + 1;
-//	debug("start_x = %d", start_x);
+
 	l = LINE_get_line_at (pad, y);
 	while(l && l != pad->line_head && r == REG_NOMATCH) {
-		if(l->str && l->str->data) {
-			ptr = l->str->data;
-			if(start_x > 0) { // first line, move to the correct place in the line
-				start_x = get_string_pos(start_x, l->str->data, &intab);
-				ptr += start_x;
-//				debug("searching from %s", ptr);
-			}
-//			debug("match string = %s", ptr);
-			/* only perform the search if we are not past the end of the line, 
-			   unless the line is empty and we are right at the start of it 
-			   (so that /$/ works for empty lines) */
-			if(*ptr || (string_length(l->str) == 0 && start_x == 0)) {
-				if(start_x > 0)
-					flags = REG_NOTBOL;
-				else
-					flags = 0;
-			
-				r = regexec(&(pad->search), ptr, 10, matchptr, flags);
-			}
+		ptr      = line_data(l);
+		line_len = strlen(ptr);
+
+		if(start_x > 0) { // first line of the search
+			// convert start_x from cursor position to string position
+			start_x = get_string_pos(start_x, ptr, &intab);
+			// move to the correct place in the line but not past the end of the line
+			ptr += (start_x < line_len) ? start_x : line_len;
 		}
+
+		/* only perform the search if we are not past the end of the line */
+		if(start_x <= line_len) {
+			if(start_x > 0)
+				flags = REG_NOTBOL;
+			else
+				flags = 0;
+
+			r = regexec(&(pad->search), ptr, 10, matchptr, flags);
+		}
+
 		if (!r) {
 			pad->curs_x = get_curs_pos(matchptr[0].rm_so + start_x, l) - pad->offset_x;
 			pad->curs_y = y - pad->offset_y;

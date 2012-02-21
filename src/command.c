@@ -77,6 +77,7 @@ void add_base_commands ()
 
 	/* search */
 	add_command("/", cmd_search);
+//	add_command("\\", cmd_search_backward);
 
 	/* system */
 	add_command ("!",    cmd_bang);

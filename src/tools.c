@@ -271,10 +271,10 @@ void create_local_config ()
 /* for the posibility of tabs                            */
 /* if position x is inside a tab, intab is set to the    */
 /* number of characters offset from the start of the tab */
-int get_string_pos (int x, char *str, int *intab)
+int get_string_pos (int x, const char *str, int *intab)
 {
 	int  a;
-	char *c;
+	const char *c;
 	int  correction;
 
 	x--;
@@ -312,13 +312,10 @@ int get_string_pos (int x, char *str, int *intab)
 int get_curs_pos (int x, line_t *l)
 {
 	int  len;
-	char *c;
+	const char *c;
 	int  a;
 
-	if (l == NULL || l->str == NULL)
-		return x;
-
-	c   = l->str->data;
+	c   = line_data(l);
 	a   = 0;
 	len = 0;
 

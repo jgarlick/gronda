@@ -163,6 +163,7 @@ extern void LINE_insert (pad_t *, int, char *);
 extern void LINE_remove (pad_t *, line_t *);
 extern line_t *LINE_get_line_at (pad_t *, int);
 extern int line_length (line_t *l);
+extern const char *line_data(line_t *l);
 extern void line_grow_pad (pad_t *pad, int ypos);
 
 /* editor.c */
@@ -216,7 +217,7 @@ int     vasprintf (char **, const char *, va_list);
 
 int     parse_commandfile (char *);
 void    create_local_config ();
-int     get_string_pos (int x, char *str, int *intab);
+int     get_string_pos (int x, const char *str, int *intab);
 int     get_curs_pos (int x, line_t *l);
 void    cursor_set_pos (pad_t *p, int curs_y, int curs_x, int adjust);
 void 	move_cursor_into_view(pad_t *pad);
@@ -277,6 +278,7 @@ void cmd_ei   (int argc, char *argv[]);
 
 /* cmd_search.c */
 void cmd_search (int argc, char *argv[]);
+void cmd_search_backward (int argc, char *argv[]);
 
 /* cmd_window.c */
 void cmd_tdm  (int argc, char *argv[]);

@@ -203,6 +203,14 @@ int line_length (line_t *l)
 	return len;
 }
 
+const char *line_data(line_t *l) {
+	static const char *empty = "";
+	
+	return (l->str && l->str->data) ? l->str->data : empty;
+}
+
+
+/* TODO move this to pad */
 void line_grow_pad (pad_t *pad, int ypos)
 {
 	while (pad->line_count < ypos)
