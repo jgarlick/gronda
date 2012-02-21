@@ -26,6 +26,7 @@ COMMANDS
 =            Position
 [row,col]    Go to row and column
 //           Forward Search
+\\           Backwards Search
 ad           Arrow Down
 al           Arrow Left
 ar           Arrow Right
