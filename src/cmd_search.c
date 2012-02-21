@@ -108,6 +108,7 @@ void search(pad_t *pad, char *new_search, int direction) {
 	}
 	if(r == REG_NOMATCH) {
 		output_message("No match");
+		display_beep();
 	}
 }
 
