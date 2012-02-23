@@ -48,14 +48,10 @@ void display_do_menu (menu_t * menu) {
 void display_finish_menu () {
 }
 
-Fl_Color bg_color, line_color, text_color, line_num_color, titlebar_color;
+Fl_Color bg_color, line_color, text_color, line_num_color, line_num_line_color, titlebar_color;
 
-#if defined(__APPLE__)
-int font = FL_SCREEN;
-#else
-int font = FL_COURIER;
-#endif
-int font_size = 13;
+int font;
+int font_size;
 
 int mouse_to_cursor   = 1;
 int show_line_numbers = 1;
@@ -72,11 +68,13 @@ int digits(int number) {
 
 class EditViewport : public Fl_Widget {
 public:
-	int viewport_w, viewport_h, line_num_columns;
+	int viewport_w, viewport_h, line_h, line_num_columns;
 	
 	void set_viewport_size(int W, int H) {
 		pad_t *pad;
-		viewport_h = floor((H - 8) / fl_height()) - 1;
+		
+		line_h     = fl_height() + 1;
+		viewport_h = floor((H - 10) / line_h) - 1;
 		viewport_w = floor((W - (6 + line_num_width())) / fl_width(' '));
 
 		pad = e->pad_head;
@@ -91,7 +89,7 @@ protected:
 		line_num_columns = (e->cepad == NULL ? 4 : digits(e->cepad->offset_y + viewport_h));
 		if (line_num_columns < 4) line_num_columns = 4;
 
-		return show_line_numbers ? (fl_width(' ') * line_num_columns) + 4 : 0;
+		return show_line_numbers ? (fl_width(' ') * line_num_columns) + 7 : 0;
 	}
 	
 	void resize(int X, int Y, int W, int H) {
@@ -143,8 +141,8 @@ protected:
 		fl_color(titlebar_color);
 		fl_rectf(x() + 2, y() + 2, w() - 4, fl_height() + 6 );
 		
-		fl_color(bg_color);
-		fl_draw((pad->filename ? pad->filename : "pad0001"), x() + 7, y() + 5 + fl_height() - fl_descent());
+		fl_color(FL_WHITE);
+		fl_draw((pad->filename ? pad->filename : "pad0001"), x() + 6, y() + 5 + fl_height() - fl_descent());
 
 		sprintf(buf, "%d", pad->offset_y + 1);
 		fl_draw(buf, x() + w() - (7 + fl_width(' ') * strlen(buf)), y() + 5 + fl_height() - fl_descent());
@@ -154,7 +152,8 @@ protected:
 			fl_draw(buf, x() + w() - (130 + fl_width(' ') * strlen(buf)), y() + 5 + fl_height() - fl_descent());			
 		}
 
-		fl_rectf(x() + w() - 113, y() + 4, 19, fl_height() + 2);
+		fl_color(bg_color);
+		fl_rectf(x() + w() - 112, y() + 5, fl_width(' ') + 8, fl_height());
 		fl_color(text_color);
 		if (!(pad->flags & FILE_WRITE))
 			sprintf(buf, "R");
@@ -162,29 +161,23 @@ protected:
 			sprintf(buf, "I");
 		else
 			sprintf(buf, "O");
-		fl_draw(buf, x() + w() - (104 + fl_width(' ') / 2), y() + 5 + fl_height() - fl_descent());
+		fl_draw(buf, x() + w() - 108, y() + 5 + fl_height() - fl_descent());
 
 		if (pad->flags & MODIFIED) {
 			fl_color(bg_color);
-			fl_rectf(x() + w() - 77, y() + 4, 19, fl_height() + 2);
+			fl_rectf(x() + w() - 82, y() + 5, fl_width(' ') + 8, fl_height());
 			fl_color(text_color);
-			fl_draw("M", x() + w() - (68 + fl_width(' ') / 2), y() + 5 + fl_height() - fl_descent());
+			fl_draw("M", x() + w() - 78, y() + 5 + fl_height() - fl_descent());
 		}
 
 		/* line num decoration */
 		if (show_line_numbers) {
-			fl_color(line_color);
+			fl_color(line_num_line_color);
 			fl_line(line_num_width(), fl_height() + 8, line_num_width(), h());
 		}
 
-		lines_start_y = y() + 8 + (fl_height() * 2 - fl_descent());
-
-		/* rectangular highlight background */
-		if (pad->echo == REGION_RECT)
-		{
-			fl_color(titlebar_color);
-			fl_rectf(pad_start_x + (fl_width(' ') * start_x), lines_start_y + (fl_height() * (start_y - 1)) + fl_descent(), fl_width(' ') * (end_x - start_x), fl_height() * ((end_y - start_y) + 1));
-		}
+		// 13 = 8 for title bar + 5 spacing below title bar
+		lines_start_y = y() + 13 + (fl_height() * 2 - fl_descent());
 		
 		/* draw the lines of text in the viewport window */
 		yp = lines_start_y;
@@ -216,7 +209,7 @@ protected:
 					str = empty_string;
 			}
 			
-			/* linear highlight background for line */
+			/* selection highlight background for line */
 			fl_color(titlebar_color);
 			if (pad->echo == REGION_LINEAR) {
 				// get the position that the cursor would be in at the end of the line
@@ -230,19 +223,21 @@ protected:
 						else
 							end = line_end;
 						
-						fl_rectf(pad_start_x + (fl_width(' ') * start_x), lines_start_y + (fl_height() * (start_y - 1)) + fl_descent(), fl_width(' ') * (end - start_x), fl_height());
+						fl_rectf(pad_start_x + (fl_width(' ') * start_x), lines_start_y + (line_h * (start_y - 1)) + fl_descent() + 1, fl_width(' ') * (end - start_x), fl_height());
 					}
 				} else if (i > start_y && i < end_y) {
-					fl_rectf(pad_start_x, lines_start_y + (fl_height() * (i - 1)) + fl_descent(), fl_width(' ') * line_end, fl_height());
+					fl_rectf(pad_start_x, lines_start_y + (line_h * (i - 1)) + fl_descent() + 1, fl_width(' ') * line_end, fl_height());
 				} else if (i == end_y && end_x > 0) {
 					end = (line_end < end_x) ? line_end : end_x;
-					fl_rectf(pad_start_x, lines_start_y + (fl_height() * (i - 1)) + fl_descent(), fl_width(' ') * end, fl_height());
+					fl_rectf(pad_start_x, lines_start_y + (line_h * (i - 1)) + fl_descent() + 1, fl_width(' ') * end, fl_height());
 				}
+			} else if(pad->echo == REGION_RECT && (i >= start_y && i <= end_y)) {
+				fl_rectf(pad_start_x + (fl_width(' ') * start_x), lines_start_y + (line_h * (i - 1)) + fl_descent() + 1, fl_width(' ') * (end_x - start_x), fl_height());
 			}
 
 			/* draw line number first */
 			if (show_line_numbers && line != pad->line_head) {
-				fl_font(font, font_size - 1);
+//				fl_font(font, font_size - 1);
 				fl_color(line_num_color);
 				sprintf(line_buffer, "%*d", line_num_columns, line_num);
 				fl_draw(line_buffer, 3, yp);
@@ -254,7 +249,7 @@ protected:
 			get_string_for_viewport(str, intab, viewport_w, line_buffer);
 			fl_draw(line_buffer, pad_start_x, yp);
 			
-			yp += fl_height();
+			yp += line_h;
 			
 			if (line != pad->line_head) {
 				line = line->next;
@@ -266,20 +261,14 @@ protected:
 		if (e->occupied_window == EDIT_WINDOW) {
 			fl_color(titlebar_color);
 			if (pad->echo && !(start_x == end_x && start_y == end_y)) {
-				fl_rect(pad_start_x + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (fl_height() * (pad->curs_y - 2)) + fl_descent(), fl_width(' '), fl_height() );			
+				fl_rect(pad_start_x + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (line_h * (pad->curs_y - 2)) + fl_descent() + 1, fl_width(' '), fl_height() );
 			} else {
-				fl_rectf(pad_start_x + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (fl_height() * (pad->curs_y - 2)) + fl_descent(), fl_width(' '), fl_height() );
+				fl_rectf(pad_start_x + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (line_h * (pad->curs_y - 2)) + fl_descent() + 1, fl_width(' '), fl_height() );
 				fl_color(bg_color);
 				sprintf(buf, "%c", pad_get_char_at(pad, pad->curs_x + pad->offset_x, pad->curs_y + pad->offset_y));
-				fl_draw(buf, pad_start_x + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (fl_height() * (pad->curs_y - 1)));
+				fl_draw(buf, pad_start_x + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (line_h * (pad->curs_y - 1)));
 			}
 		}
-		
-/*		fl_draw(buffer, x(), yp);
-		yp += fl_height();
-		fl_draw("line 2 Command", x(), yp);*/
-
-//		fl_draw("Command: ", x() + 1, y() + fl_height() - fl_descent());
 	}
 public:
     EditViewport(int X, int Y, int W, int H, const char *l=0)
@@ -291,7 +280,7 @@ public:
 		int new_x, new_y;
 		
 		new_x = floor((X + 3 - line_num_width()) / fl_width(' '));
-		new_y = floor((Y + 6) / fl_height()) - 1;
+		new_y = floor((Y) / line_h) - 1;
 	
 		if (new_x > 0 && new_x <= viewport_w && new_y > 0 && new_y <= viewport_h) {
 			if (e->occupied_window != EDIT_WINDOW) {
@@ -599,6 +588,27 @@ int main(int argc, char **argv) {
 	int font_height;
 	int font_width;
 	int bottom_bar_height;
+	int i,k,t;
+	const char *name;
+
+#if defined(__APPLE__)
+	font = FL_SCREEN;
+	font_size = 14;
+#else
+	font = FL_COURIER;
+	font_size = 14;
+#endif
+
+	/* use DM font if installed */
+	k = Fl::set_fonts("");
+	for (i = 0; i < k; i++) {
+		name = Fl::get_font_name((Fl_Font)i,&t);
+//		printf("%s\n", name);
+		if(!strcasecmp(name, "Apollo DM")) {
+			font = i;
+			font_size = 14;
+		}
+	}
 
 	editor_setup(argc, argv);
 	add_command ("mouse",  (void (*)())cmd_mouse);
@@ -624,8 +634,9 @@ int main(int argc, char **argv) {
 //	line_color     = fl_rgb_color(150, 150, 150);
 	line_color = titlebar_color;
 
-	text_color     = fl_rgb_color(0, 0, 0);
-	line_num_color = fl_rgb_color(100, 100, 100);
+	text_color          = fl_rgb_color(0, 0, 0);
+	line_num_color      = fl_rgb_color(140, 140, 140);
+	line_num_line_color = fl_rgb_color(210, 210, 210);
 
 	Fl::visual(FL_DOUBLE|FL_INDEX);
 
