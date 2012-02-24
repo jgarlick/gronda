@@ -514,9 +514,9 @@ int MyWindow::handle(int event) {
 	    k = Fl::event_key();
 
 		if (k > 0 && k < 256) {
-			if (mods == FL_SHIFT) // shift only, no other modifiers
+			if ((mods & FL_SHIFT) && !(mods & (FL_CTRL|FL_ALT|FL_META))) { // shift only, no other modifiers
 				k = Fl::event_text()[0]; // text for the key, handles shift+standard keypress
-
+			}
 			if (k == '\'') {
 				sprintf(buffer, "squote");
 			} else if (k == '"') {
@@ -557,7 +557,7 @@ int MyWindow::handle(int event) {
 	if (len > 0) {
 		// don't add S to regular keys e.g. shift+a, but add them when another modifier key
 		// is also pressed e.g. shift+ctrl+a generates ^aS
-		if ((mods & FL_SHIFT) && (event== FL_PUSH || event== FL_RELEASE || k > 255 || mods != FL_SHIFT)) {
+		if ((mods & FL_SHIFT) && (event== FL_PUSH || event== FL_RELEASE || k > 255 || (mods & (FL_CTRL|FL_ALT|FL_META)))) {
 			buffer[len]     = 'S';
 			buffer[len + 1] = '\0';
 		}
