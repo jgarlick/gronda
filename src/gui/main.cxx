@@ -25,6 +25,12 @@
 
 #include <FL/names.h>
 
+/* for mouse position warping */
+#include <FL/x.H>
+#if defined(__APPLE__)
+#include <ApplicationServices/ApplicationServices.h>
+#endif
+
 extern "C" {
 #include "../include/editor.h"
 }
@@ -66,16 +72,46 @@ int digits(int number) {
 	return digits;
 }
 
+int warp_mouse_pointer (int new_x, int new_y) {
+#if defined WIN32
+      BOOL result = SetCursorPos(new_x, new_y);
+      if (result) return 0; // OK
+
+#elif defined __APPLE__
+      CGPoint new_pos;
+      CGEventErr err;
+      new_pos.x = new_x;
+      new_pos.y = new_y;
+      err = CGWarpMouseCursorPosition(new_pos);
+      if (!err) return 0; // OK
+
+#else // Assume this is Xlib
+      Window rootwindow = DefaultRootWindow(fl_display);
+      XWarpPointer(fl_display, rootwindow, rootwindow, 0, 0, 0, 0,
+new_x, new_y);
+      return 0; // Assume OK
+#endif
+
+      return -1; // Fail
+}
+
 class EditViewport : public Fl_Widget {
 public:
 	int viewport_w, viewport_h, line_h, line_num_columns;
 	
+	int pad_start_x, pad_start_y;  // the position in the widget of the start of the pad text
+
 	void set_viewport_size(int W, int H) {
 		pad_t *pad;
 		
 		line_h     = fl_height() + 1;
 		viewport_h = floor((H - 10) / line_h) - 1;
 		viewport_w = floor((W - (6 + line_num_width())) / fl_width(' '));
+
+		pad_start_x = x() + 3 + line_num_width();
+
+		// 13 = 8 for title bar + 5 spacing below title bar
+		pad_start_y = y() + 13 + (fl_height() * 2 - fl_descent());
 
 		pad = e->pad_head;
 		while(pad != NULL) {
@@ -107,9 +143,7 @@ protected:
 		int line_end, end;
 		int offset, intab;
 		char empty_string[1] = "";
-		int lines_start_y;
 		pad_t *pad;
-		int pad_start_x;
 		int line_num;
 
 		int start_y = 0;
@@ -118,11 +152,8 @@ protected:
 		int end_x   = 0;
 
 		pad = e->cepad;
-		
-		pad_start_x = x() + 3 + line_num_width();
-		
-		if (pad->echo)
-		{
+
+		if (pad->echo) {
 			get_region (pad->echo, &start_y, &start_x, &end_y, &end_x);
 
 			start_y -= pad->offset_y + 1;
@@ -175,12 +206,9 @@ protected:
 			fl_color(line_num_line_color);
 			fl_line(line_num_width(), fl_height() + 8, line_num_width(), h());
 		}
-
-		// 13 = 8 for title bar + 5 spacing below title bar
-		lines_start_y = y() + 13 + (fl_height() * 2 - fl_descent());
 		
 		/* draw the lines of text in the viewport window */
-		yp = lines_start_y;
+		yp = pad_start_y;
 		line_num = 1 + pad->offset_y;
 		line = LINE_get_line_at (pad, line_num);
 		if (line == NULL)
@@ -223,16 +251,16 @@ protected:
 						else
 							end = line_end;
 						
-						fl_rectf(pad_start_x + (fl_width(' ') * start_x), lines_start_y + (line_h * (start_y - 1)) + fl_descent() + 1, fl_width(' ') * (end - start_x), fl_height());
+						fl_rectf(pad_start_x + (fl_width(' ') * start_x), pad_start_y + (line_h * (start_y - 1)) + fl_descent() + 1, fl_width(' ') * (end - start_x), fl_height());
 					}
 				} else if (i > start_y && i < end_y) {
-					fl_rectf(pad_start_x, lines_start_y + (line_h * (i - 1)) + fl_descent() + 1, fl_width(' ') * line_end, fl_height());
+					fl_rectf(pad_start_x, pad_start_y + (line_h * (i - 1)) + fl_descent() + 1, fl_width(' ') * line_end, fl_height());
 				} else if (i == end_y && end_x > 0) {
 					end = (line_end < end_x) ? line_end : end_x;
-					fl_rectf(pad_start_x, lines_start_y + (line_h * (i - 1)) + fl_descent() + 1, fl_width(' ') * end, fl_height());
+					fl_rectf(pad_start_x, pad_start_y + (line_h * (i - 1)) + fl_descent() + 1, fl_width(' ') * end, fl_height());
 				}
 			} else if(pad->echo == REGION_RECT && (i >= start_y && i <= end_y)) {
-				fl_rectf(pad_start_x + (fl_width(' ') * start_x), lines_start_y + (line_h * (i - 1)) + fl_descent() + 1, fl_width(' ') * (end_x - start_x), fl_height());
+				fl_rectf(pad_start_x + (fl_width(' ') * start_x), pad_start_y + (line_h * (i - 1)) + fl_descent() + 1, fl_width(' ') * (end_x - start_x), fl_height());
 			}
 
 			/* draw line number first */
@@ -261,12 +289,12 @@ protected:
 		if (e->occupied_window == EDIT_WINDOW) {
 			fl_color(titlebar_color);
 			if (pad->echo && !(start_x == end_x && start_y == end_y)) {
-				fl_rect(pad_start_x + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (line_h * (pad->curs_y - 2)) + fl_descent() + 1, fl_width(' '), fl_height() );
+				fl_rect(pad_start_x + (fl_width(' ') * (pad->curs_x - 1)), pad_start_y + (line_h * (pad->curs_y - 2)) + fl_descent() + 1, fl_width(' '), fl_height() );
 			} else {
-				fl_rectf(pad_start_x + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (line_h * (pad->curs_y - 2)) + fl_descent() + 1, fl_width(' '), fl_height() );
+				fl_rectf(pad_start_x + (fl_width(' ') * (pad->curs_x - 1)), pad_start_y + (line_h * (pad->curs_y - 2)) + fl_descent() + 1, fl_width(' '), fl_height() );
 				fl_color(bg_color);
 				sprintf(buf, "%c", pad_get_char_at(pad, pad->curs_x + pad->offset_x, pad->curs_y + pad->offset_y));
-				fl_draw(buf, pad_start_x + (fl_width(' ') * (pad->curs_x - 1)), lines_start_y + (line_h * (pad->curs_y - 1)));
+				fl_draw(buf, pad_start_x + (fl_width(' ') * (pad->curs_x - 1)), pad_start_y + (line_h * (pad->curs_y - 1)));
 			}
 		}
 	}
@@ -291,6 +319,10 @@ public:
 			e->cpad->curs_y = new_y;
 		}
 	}
+	void get_cursor_position(int *pos_x, int *pos_y) {
+		*pos_x = pad_start_x + (fl_width(' ') * (e->cepad->curs_x - 1));
+		*pos_y = pad_start_y + (line_h * (e->cepad->curs_y - 2)) + fl_descent() + 1;
+	}
 
 	int in_edit_window(int X, int Y) {
 		return (X > (3 + line_num_width()) && X < w() - 3 && Y > (6 + fl_height()) && Y < (6 + ((viewport_h + 1) * fl_height()) + fl_descent()));
@@ -306,6 +338,8 @@ void close_window(Fl_Widget* win, void* v) {
 }
 
 class MyWindow : public Fl_Double_Window {
+	int mouse_x, mouse_y;
+
 	int handle(int);
 
 	void set_mouse_cursor(int X, int Y) {
@@ -380,6 +414,11 @@ public:
 	: Fl_Widget(X,Y,W,H,l) {
 		set_viewport_size(W, H);
 	}
+
+	void get_cursor_position(int *pos_x, int *pos_y) {
+		*pos_x = x() + 3 + fl_width(e->cepad->prompt->data) + (fl_width(' ') * (e->input_pad->curs_x - 1));
+		*pos_y = y() + 4;
+	}
 };
 
 class OutputViewport : public Fl_Widget {
@@ -447,7 +486,7 @@ int MyWindow::handle(int event) {
 	int k, c, mods;
 	int len;
 	buffer_t *paste_buffer;
-	int x, y, old_x, old_y;
+	int old_x, old_y, curs_x, curs_y;
 
 	if (event == FL_FOCUS) {
 		Fl::paste((Fl_Widget &)*this, 1);
@@ -500,15 +539,17 @@ int MyWindow::handle(int event) {
 	}
 
 	if (event== FL_MOVE || event== FL_DRAG) {
-		x = Fl::event_x();
-		y = Fl::event_y();
+		mouse_x = Fl::event_x();
+		mouse_y = Fl::event_y();
 		old_x = e->cpad->curs_x;
 		old_y = e->cpad->curs_y;
 		if (mouse_to_cursor)
-			edit_viewport->move_cursor(x, y);
-		set_mouse_cursor(x, y);
+			edit_viewport->move_cursor(mouse_x, mouse_y);
 
-		if(!edit_viewport->in_edit_window(x, y) || (e->cpad->curs_x != old_x) || (e->cpad->curs_y != old_y))
+//		set_mouse_cursor(mouse_x, mouse_y); // use this to hide the mouse pointer all the time when in a pad
+		fl_cursor(FL_CURSOR_DEFAULT);
+
+		if(!edit_viewport->in_edit_window(mouse_x, mouse_y) || (e->cpad->curs_x != old_x) || (e->cpad->curs_y != old_y))
 			edit_viewport->redraw();
 	}
 
@@ -542,8 +583,29 @@ int MyWindow::handle(int event) {
 //		printf("key find %s\n", buffer);
 		keydef = KEY_find (buffer);
 
-		if (keydef)
+		if (keydef) {
 			parse ("%s", keydef->def);
+
+			if (mouse_to_cursor) {
+				fl_cursor(FL_CURSOR_NONE); // hide mouse pointer until it is next moved
+				curs_x = curs_y = 0;
+				if (e->occupied_window == EDIT_WINDOW) {
+					edit_viewport->get_cursor_position(&curs_x, &curs_y);
+				} else if (e->occupied_window == COMMAND_WINDOW) {
+					input_viewport->get_cursor_position(&curs_x, &curs_y);
+				}
+				// move the mouse pointer to the cursor position
+				if(curs_x && curs_y) {
+					if(mouse_x < curs_x || mouse_x > (curs_x + fl_width(' ')) || mouse_y < curs_y || mouse_y > (curs_y + fl_height())) {
+						mouse_x = curs_x + (fl_width(' ') / 2);
+						mouse_y = curs_y + (fl_height() / 2);
+						warp_mouse_pointer(x() + mouse_x, y() + mouse_y);
+					}
+				}
+			} else {
+				fl_cursor(FL_CURSOR_DEFAULT);
+			}
+		}
 
 		edit_viewport->redraw();
 		input_viewport->redraw();
