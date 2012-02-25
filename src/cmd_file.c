@@ -51,8 +51,8 @@ void cmd_ce (int argc, char *argv[])
 
 	if (!crash_file_check (pad, argv[1])) {
 		pad_read_file(pad, argv[1]);
+		display_filename(pad->filename);
 	}
-
 }
 
 /* pad write */
@@ -106,6 +106,7 @@ void cmd_pn (int argc, char *argv[])
 	e->cpad->flags |= MODIFIED;
 
 	e->redraw |= (TITLE|STATS);
+	display_filename(e->cpad->filename);
 }
 
 /* show working directory in output window */

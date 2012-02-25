@@ -43,6 +43,7 @@ static void crash_file_callback (char *text)
 	}
 
 	pad_read_file(e->cepad, crash_file_name);
+	display_filename(e->cepad->filename);
  
 	if (*text == 'y') /* using crash file */
 	{

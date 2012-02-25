@@ -177,4 +177,5 @@ void cmd_tn (int argc, char *argv[])
 	if (next == NULL) next = e->pad_head;
 
 	e->cepad = e->cpad = next;
+	display_filename(e->cepad->filename);
 }

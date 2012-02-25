@@ -35,25 +35,6 @@ extern "C" {
 #include "../include/editor.h"
 }
 
-void display_copy(buffer_t *buf) {
-	if (!strcmp(buf->name, "clipboard")) {
-		Fl::copy(buf->str->data, strlen(buf->str->data), 1);
-	}
-}
-
-void display_close () {
-}
-
-void display_beep () {
-	fl_beep();
-}
-
-void display_do_menu (menu_t * menu) {
-}
-
-void display_finish_menu () {
-}
-
 Fl_Color bg_color, line_color, text_color, line_num_color, line_num_line_color, titlebar_color;
 
 int font;
@@ -645,6 +626,24 @@ extern "C" void cmd_lineno (int argc, char *argv[]) {
 	edit_viewport->set_viewport_size(edit_viewport->w(), edit_viewport->h());
 }
 
+/* display callbacks */
+void display_copy(buffer_t *buf) {
+	if (!strcmp(buf->name, "clipboard")) {
+		Fl::copy(buf->str->data, strlen(buf->str->data), 1);
+	}
+}
+
+void display_close () { }
+
+void display_filename(const char *filename) {
+	if(window) window->label(filename);
+}
+
+void display_beep () { fl_beep(); }
+
+void display_do_menu (menu_t * menu) { }
+void display_finish_menu () { }
+
 
 int main(int argc, char **argv) {
 	int font_height;
@@ -719,6 +718,7 @@ int main(int argc, char **argv) {
 //	window->border(0); /* remove window manager titles and border */
 	window->resizable(*edit_viewport);
 	window->callback(close_window);
+	display_filename(e->cepad->filename);
 	window->show();
 	Fl::focus(window);
 	return(Fl::run());
