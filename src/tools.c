@@ -46,7 +46,6 @@ void parse (const char *format, ...)
 	char   *str;
 	va_list argp;
 	line_t *line;
-	char   empty_string = '\0';
 
 	if (e->occupied_window == COMMAND_WINDOW) {
 		e->cpad = e->input_pad;
@@ -69,7 +68,7 @@ void parse (const char *format, ...)
 		line = e->input_pad->line_head->prev->prev;
 		if (line != e->input_pad->line_head) {
 			if (e->cepad->prompt_callback) {
-				(e->cepad->prompt_callback) ((line->str && line->str->data) ? line->str->data : &empty_string);
+				(e->cepad->prompt_callback) (line_data(line));
 			} else if(line->str && line->str->data) {
 				parse(line->str->data);
 			}

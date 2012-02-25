@@ -203,6 +203,7 @@ int line_length (line_t *l)
 	return len;
 }
 
+/* string data for the line is read only */
 const char *line_data(line_t *l) {
 	static const char *empty = "";
 	
