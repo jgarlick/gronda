@@ -40,7 +40,7 @@ Fl_Color bg_color, line_color, text_color, line_num_color, line_num_line_color, 
 int font;
 int font_size;
 
-int mouse_to_cursor   = 1;
+bool cursor_follows_mouse = true;
 int show_line_numbers = 1;
 
 int digits(int number) {
@@ -324,7 +324,7 @@ class MyWindow : public Fl_Double_Window {
 	int handle(int);
 
 	void set_mouse_cursor(int X, int Y) {
-		if (mouse_to_cursor && edit_viewport->in_edit_window(X, Y)) {
+		if (cursor_follows_mouse && edit_viewport->in_edit_window(X, Y)) {
 			fl_cursor(FL_CURSOR_NONE);
 		} else {
 			fl_cursor(FL_CURSOR_DEFAULT);
@@ -524,7 +524,7 @@ int MyWindow::handle(int event) {
 		mouse_y = Fl::event_y();
 		old_x = e->cpad->curs_x;
 		old_y = e->cpad->curs_y;
-		if (mouse_to_cursor)
+		if (cursor_follows_mouse)
 			edit_viewport->move_cursor(mouse_x, mouse_y);
 
 //		set_mouse_cursor(mouse_x, mouse_y); // use this to hide the mouse pointer all the time when in a pad
@@ -567,7 +567,7 @@ int MyWindow::handle(int event) {
 		if (keydef) {
 			parse ("%s", keydef->def);
 
-			if (mouse_to_cursor) {
+			if (cursor_follows_mouse) {
 				fl_cursor(FL_CURSOR_NONE); // hide mouse pointer until it is next moved
 				curs_x = curs_y = 0;
 				if (e->occupied_window == EDIT_WINDOW) {
@@ -596,19 +596,19 @@ int MyWindow::handle(int event) {
 	return (1); // eat all keystrokes
 }
 
-extern "C" void cmd_mouse (int argc, char *argv[]) {
+extern "C" void cmd_follow (int argc, char *argv[]) {
 	if (argc > 1)
 	{
 		if (strcmp (argv[1], "-on") == 0)
-			mouse_to_cursor = 1;
+			cursor_follows_mouse = true;
 		else if (strcmp (argv[1], "-off") == 0)
-			mouse_to_cursor = 0;
+			cursor_follows_mouse = false;
 	}
 	else
-		mouse_to_cursor = !mouse_to_cursor;
+		cursor_follows_mouse = !cursor_follows_mouse;
 }
 
-extern "C" void cmd_sic (int argc, char *argv[]) {
+extern "C" void cmd_tm (int argc, char *argv[]) {
 	edit_viewport->move_cursor(Fl::event_x(), Fl::event_y());
 }
 
@@ -672,8 +672,8 @@ int main(int argc, char **argv) {
 	}
 
 	editor_setup(argc, argv);
-	add_command ("mouse",  (void (*)())cmd_mouse);
-	add_command ("sic",    (void (*)())cmd_sic);
+	add_command ("follow", (void (*)())cmd_follow);
+	add_command ("tm",     (void (*)())cmd_tm);
 	add_command ("lineno", (void (*)())cmd_lineno);
 
 	// Aegis Blue

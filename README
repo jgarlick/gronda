@@ -42,7 +42,7 @@ er           Enter Raw
 es           Enter String
 kd           Key Definition
 lineno       Line numbers on/off
-mouse        Mouse to Text Cursor on/off
+follow       Cursor follows mouse on/off
 msg          Message to output window
 pb           Pad Bottom
 ph           Pad Horizontal
@@ -53,7 +53,7 @@ pv           Pad Vertical
 pw           Pad Write
 wd           Working Directory
 ro           Read Only
-sic          Set Insert Cursor
+tm           To mouse (used when follow is off)
 tb           To Bottom
 tdm          To DM
 tl           To Left
