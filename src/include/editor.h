@@ -250,7 +250,7 @@ void cmd_goto (int argc, char *argv[]);
 void cmd_ce   (int argc, char *argv[]);
 void cmd_pw   (int argc, char *argv[]);
 void cmd_pn   (int argc, char *argv[]);
-void cmd_pwd  (int argc, char *argv[]);
+void cmd_wd  (int argc, char *argv[]);
 void cmd_ro   (int argc, char *argv[]);
 
 /* cmd_key.c */

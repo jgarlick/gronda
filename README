@@ -51,7 +51,7 @@ pp           Pad Page
 pt           Pad Top
 pv           Pad Vertical
 pw           Pad Write
-pwd          Print Working Directory
+wd           Working Directory
 ro           Read Only
 sic          Set Insert Cursor
 tb           To Bottom

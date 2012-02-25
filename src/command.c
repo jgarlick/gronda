@@ -46,7 +46,7 @@ void add_base_commands ()
 	add_command ("ce",   cmd_ce);
 	add_command ("pw",   cmd_pw);
 	add_command ("pn",   cmd_pn);
-	add_command ("pwd",  cmd_pwd);
+	add_command ("wd",   cmd_wd);
 	add_command ("ro",   cmd_ro);
 
 	/* pad */

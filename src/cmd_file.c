@@ -108,8 +108,9 @@ void cmd_pn (int argc, char *argv[])
 	e->redraw |= (TITLE|STATS);
 }
 
-/* print working directory */
-void cmd_pwd (int argc, char *argv[])
+/* show working directory in output window */
+/* TODO change directory with an argument to this */
+void cmd_wd (int argc, char *argv[])
 {
 	output_message (getenv ("PWD"));
 }
