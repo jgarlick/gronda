@@ -626,6 +626,10 @@ extern "C" void cmd_lineno (int argc, char *argv[]) {
 	edit_viewport->set_viewport_size(edit_viewport->w(), edit_viewport->h());
 }
 
+extern "C" void cmd_icon (int argc, char *argv[]) {
+	window->iconize();
+}
+
 /* display callbacks */
 void display_copy(buffer_t *buf) {
 	if (!strcmp(buf->name, "clipboard")) {
@@ -675,6 +679,7 @@ int main(int argc, char **argv) {
 	add_command ("follow", (void (*)())cmd_follow);
 	add_command ("tm",     (void (*)())cmd_tm);
 	add_command ("lineno", (void (*)())cmd_lineno);
+	add_command ("icon",   (void (*)())cmd_icon);
 
 	// Aegis Blue
 	bg_color       = fl_rgb_color(255, 255, 230);

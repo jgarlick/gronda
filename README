@@ -40,9 +40,10 @@ ei           Insert/Overstrike
 en           Enter Newline
 er           Enter Raw
 es           Enter String
+follow       Cursor follows mouse on/off
+icon         Iconify window
 kd           Key Definition
 lineno       Line numbers on/off
-follow       Cursor follows mouse on/off
 msg          Message to output window
 pb           Pad Bottom
 ph           Pad Horizontal
@@ -53,10 +54,10 @@ pv           Pad Vertical
 pw           Pad Write
 wd           Working Directory
 ro           Read Only
-tm           To mouse (used when follow is off)
 tb           To Bottom
 tdm          To DM
 tl           To Left
+tm           To Mouse (used when follow is off)
 tn           To Next Pad
 tr           To Right
 tt           To Top
