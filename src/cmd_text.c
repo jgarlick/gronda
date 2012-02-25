@@ -46,7 +46,7 @@ void cmd_es (int argc, char *argv[])
 	ypos = pad->curs_y + pad->offset_y;
 
 	if (ypos > pad->line_count)
-		line_grow_pad (pad, ypos);
+		pad_grow (pad, ypos);
 
 	cline = LINE_get_line_at (pad, ypos);
 	if (cline->str == NULL)
@@ -126,7 +126,7 @@ void cmd_en (int argc, char *argv[])
 	ypos = pad->curs_y + pad->offset_y;
 
 	if (ypos > pad->line_count)
-		line_grow_pad (pad, ypos);
+		pad_grow (pad, ypos);
 
 	LINE_insert (pad, ypos, "");
 	cline = LINE_get_line_at (pad, ypos);
@@ -188,7 +188,7 @@ void cmd_ed (int argc, char *argv[])
 
 	if (ypos > pad->line_count)
 	{
-		line_grow_pad (pad, ypos);
+		pad_grow (pad, ypos);
 		pad_modified (pad);
 		return;
 	}

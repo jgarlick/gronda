@@ -210,15 +210,3 @@ const char *line_data(line_t *l) {
 }
 
 
-/* TODO move this to pad */
-void line_grow_pad (pad_t *pad, int ypos)
-{
-	while (pad->line_count < ypos)
-	{
-		/* TODO: LINE_append should really return an error status,
-				 and it should be checked here */
-		LINE_append (pad, "");
-	}
-}
-
-

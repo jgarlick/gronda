@@ -231,3 +231,13 @@ void pad_read_file(pad_t *pad, char *filename) {
 	else
 		pad->flags &= ~FILE_WRITE;
 }
+
+void pad_grow (pad_t *pad, int ypos)
+{
+	while (pad->line_count < ypos)
+	{
+		/* TODO: LINE_append should really return an error status,
+				 and it should be checked here */
+		LINE_append (pad, "");
+	}
+}

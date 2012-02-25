@@ -164,7 +164,6 @@ extern void LINE_remove (pad_t *, line_t *);
 extern line_t *LINE_get_line_at (pad_t *, int);
 extern int line_length (line_t *l);
 extern const char *line_data(line_t *l);
-extern void line_grow_pad (pad_t *pad, int ypos);
 
 /* editor.c */
 extern editor_t *e;
@@ -185,6 +184,8 @@ void pad_set_prompt(pad_t *pad, char *str, void (*callback) ());
 void pad_clear_prompt(pad_t *pad);
 void pad_read_file(pad_t *pad, char *filename);
 void pad_goto(pad_t *pad, int row, int col, int adjust);
+void pad_grow(pad_t *pad, int ypos);
+
 
 /* signals.c */
 void    sig_init (void);
