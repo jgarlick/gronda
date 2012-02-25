@@ -118,35 +118,19 @@ void cmd_pwd (int argc, char *argv[])
 void cmd_ro (int argc, char *argv[])
 {
 	pad_t  *p = e->cpad;
-	int     r;
 
-	if (argc == 1)
-	{
+	if (argc > 1) {
+		if (!strcasecmp (argv[1], "on"))
+			p->flags |= FILE_WRITE;
+		else if (!strcasecmp (argv[1], "off"))
+			p->flags &= ~FILE_WRITE;
+	} else {
 		p->flags ^= FILE_WRITE;
 	}
-	else
-	{
-		if (!strcasecmp (argv[1], "on"))
-		{
-			p->flags |= FILE_WRITE;
-		}
-		else if (!strcasecmp (argv[1], "off"))
-		{
-			p->flags &= ~FILE_WRITE;
-		}
-	}
-	if (p->flags & FILE_WRITE)
-	{
-		if (p->filename != NULL)
-		{
-			r = access (p->filename, W_OK);
-
-			if (r == -1 && errno != ENOENT)
-			{
-				p->flags &= ~FILE_WRITE;
-				output_message_c (argv[0], "Permission denied");
-			}
-		}
+	
+	if ((p->flags & FILE_WRITE) && p->filename != NULL && access(p->filename, W_OK) == -1 && errno != ENOENT) {
+		p->flags &= ~FILE_WRITE;
+		output_message_c (argv[0], "Permission denied");
 	}
 
 	e->redraw |= STATS;
