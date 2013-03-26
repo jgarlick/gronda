@@ -53,7 +53,7 @@ void LINE_free_lines (line_t * head)
 }
 
 /* Append a line to a line list  */
-void LINE_append (pad_t * p, char *str)
+line_t *LINE_append (pad_t * p, char *str)
 {
 	line_t *head;
 	line_t *new;
@@ -64,7 +64,7 @@ void LINE_append (pad_t * p, char *str)
 	if (!new)
 	{
 		debug ("LINE_append: out of memory\n");
-		return;
+		return NULL;
 	}
 
 	new->next = head;
@@ -79,6 +79,8 @@ void LINE_append (pad_t * p, char *str)
 	(new->prev)->next = new;
 
 	p->line_count++;
+	
+	return new;
 }
 
 /* return the number of lines in the list */

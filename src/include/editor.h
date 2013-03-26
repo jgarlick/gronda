@@ -158,7 +158,7 @@ extern void add_base_commands (void);
 /* line.c */
 extern line_t *LINE_new_lines (void);
 extern void LINE_free_lines (line_t *);
-extern void LINE_append (pad_t *, char *);
+extern line_t *LINE_append (pad_t *, char *);
 extern void LINE_insert (pad_t *, int, char *);
 extern void LINE_remove (pad_t *, line_t *);
 extern line_t *LINE_get_line_at (pad_t *, int);

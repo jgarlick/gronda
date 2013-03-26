@@ -76,7 +76,7 @@ void string_free (string_t * target)
 void string_append (string_t * target, char *format, ...)
 {
 	char    *new;
-	int     required;
+	int     required, len1, len2;
 	va_list argp;
 
 	if (target == NULL)
@@ -86,7 +86,9 @@ void string_append (string_t * target, char *format, ...)
 	vasprintf (&new, format, argp);
 	va_end (argp);
 
-	required = (strlen (target->data) + strlen (new)) - target->allocated;
+	len1 = strlen (target->data);
+	len2 = strlen (new);
+	required = (len1 + len2) - target->allocated;
 
 	if (required >= 0)
 	{
@@ -98,41 +100,14 @@ void string_append (string_t * target, char *format, ...)
 		target->allocated += required;
 	}
 
-	strcat (target->data, new);
+	memcpy(target->data + len1, new, len2 + 1);
 
 	free (new);
 }
 
-void string_nappend (string_t * target, char *format, ...)
-{
-	char    *new;
-	int     required;
-	va_list argp;
-
-	if (target == NULL)
-		return;
-
-	va_start (argp, format);
-	vasprintf (&new, format, argp);
-	va_end (argp);
-
-	required = (strlen (target->data) + strlen (new)) - target->allocated;
-
-	if (required >= 0)
-	{
-		// round to the nearest block
-		required = (required / BLOCKSIZE) + 1;
-		required = required * BLOCKSIZE;
-
-		target->data = REALLOC (target->data, target->allocated + required);
-		target->allocated += required;
-	}
-
-	strcat (target->data, new);
-
-	free (new);
-}
-
+/* insert a string at the specified position */
+/* if the position is beyond the end of the target string then it is */
+/* padded out with the appropriate number of spaces */
 void string_insert (string_t * target, int pos, char *format, ...)
 {
 	char   *new;

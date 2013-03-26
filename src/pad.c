@@ -160,10 +160,10 @@ void pad_clear_prompt(pad_t *pad) {
 
 void pad_read_file(pad_t *pad, char *filename) {
 	FILE        *f;
-	string_t    *buf;
 	char        tmp[1024];
 	char        *c;
-	char   *args[2];
+	char        val;
+	line_t      *line;
 
 	f = fopen (filename, "r");
 	if (!f && (errno != ENOENT))
@@ -175,10 +175,10 @@ void pad_read_file(pad_t *pad, char *filename) {
 	pad->filename = strdup (filename);
 	e->redraw |= (DIRTY_ALL | TITLE | STATS);
 
-	if (!f)
-		return;
+	/* if the file does not exist just return at this stage */
+	if (!f)	return;
 
-	buf = string_alloc ("");
+	line = NULL;
 
 	while (!feof (f))
 	{
@@ -189,47 +189,23 @@ void pad_read_file(pad_t *pad, char *filename) {
 		while (*c != '\n' && *c)
 			c++;
 
-		if (*c == '\n')
-		{
-			*c = 0;
-			string_append (buf, "%s", tmp);
+		val = *c;
+		if (val == '\n') *c = 0;
 
-			args[0] = "es";
-			args[1] = buf->data;
-			cmd_es (2, args);
-
-			args[0] = "ad";
-			args[1] = "-s";
-			cmd_ad (2, args);
-			cmd_tl (0, NULL);
-
-			string_truncate (buf, 0);
+		if(line == NULL) {
+			line = LINE_append(pad, tmp);
+		} else {
+			string_append(line->str, "%s", tmp);
 		}
-		else
-			string_append (buf, "%s", tmp);
 
+		if (val == '\n') line = NULL;
 	}
 
-	if (strlen (buf->data) > 0)
-	{
-		args[0] = "es";
-		args[1] = buf->data;
-		cmd_es (2, args);
-	}
-
-	string_free (buf);
-
-	pad->curs_x   = 1;
-	pad->curs_y   = 1;
-	pad->offset_x = 0;
-	pad->offset_y = 0;
 	pad->flags    = 0;
 
-	/* set the read/write / read only mode */
+	/* set the write flag if the file can be written */
 	if (access (pad->filename, W_OK) != -1)
 		pad->flags |= FILE_WRITE;
-	else
-		pad->flags &= ~FILE_WRITE;
 }
 
 void pad_grow (pad_t *pad, int ypos)
