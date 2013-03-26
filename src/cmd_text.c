@@ -25,52 +25,17 @@
 /* ES: Enter String */
 void cmd_es (int argc, char *argv[])
 {
-	pad_t  *pad = e->cpad;
-	int     xpos;
-	int     ypos;
-	line_t *cline;
-	int     intab;
-
-	if (!(e->cpad->flags & FILE_WRITE))
-	{
+	if (!(e->cpad->flags & FILE_WRITE)) {
 		output_message_c ("es", "Pad is read-only");
 		return;
 	}
 
-	if (argc < 2)
-	{
+	if (argc < 2) {
 		output_message_c ("es", "Missing string argument");
 		return;
 	}
 
-	ypos = pad->curs_y + pad->offset_y;
-
-	if (ypos > pad->line_count)
-		pad_grow (pad, ypos);
-
-	cline = LINE_get_line_at (pad, ypos);
-	if (cline->str == NULL)
-		cline->str = string_alloc ("");
-
-	xpos = get_string_pos (pad->curs_x + pad->offset_x, cline->str->data, &intab);
-
-	if (e->flags & INSERT)
-		string_insert (cline->str, xpos, "%s", argv[1]);
-	else
-		string_overwrite (cline->str, xpos, "%s", argv[1]);
-
-/*	string_debug (cline->str);*/
-
-	/* horizontal cursor movement */
-	pad->curs_x = get_curs_pos (xpos + strlen (argv[1]), cline) - pad->offset_x;
-
-	while (pad->curs_x > pad->width)
-	{
-		pad->offset_x += PADSTEP;
-		pad->curs_x   -= PADSTEP;
-	}
-
-	pad_modified (pad);
+	pad_insert_string(e->cpad, argv[1]);
 }
 
 void cmd_er (int argc, char *argv[])

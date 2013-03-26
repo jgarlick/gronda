@@ -185,7 +185,7 @@ void pad_clear_prompt(pad_t *pad);
 void pad_read_file(pad_t *pad, char *filename);
 void pad_goto(pad_t *pad, int row, int col, int adjust);
 void pad_grow(pad_t *pad, int ypos);
-
+void pad_insert_string(pad_t *pad, const char *str);
 
 /* signals.c */
 void    sig_init (void);

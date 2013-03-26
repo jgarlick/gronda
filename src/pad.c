@@ -208,6 +208,8 @@ void pad_read_file(pad_t *pad, char *filename) {
 		pad->flags |= FILE_WRITE;
 }
 
+/*** UNDO ACTIONS **/
+
 void pad_grow (pad_t *pad, int ypos)
 {
 	while (pad->line_count < ypos)
@@ -216,4 +218,44 @@ void pad_grow (pad_t *pad, int ypos)
 				 and it should be checked here */
 		LINE_append (pad, "");
 	}
+}
+
+#define PADSTEP (8)
+
+/* insert a string at the current cursor position */
+void pad_insert_string(pad_t *pad, const char *str) {
+	int     xpos;
+	int     ypos;
+	line_t *cline;
+	int     intab;
+	
+	ypos = pad_pos_y(pad);
+
+	if (ypos > pad->line_count)
+		pad_grow (pad, ypos);
+
+	cline = LINE_get_line_at (pad, ypos);
+	if (cline->str == NULL)
+		cline->str = string_alloc ("");
+
+	xpos = get_string_pos (pad_pos_x(pad), line_data(cline), &intab);
+
+	if (e->flags & INSERT) {
+		string_insert (cline->str, xpos, "%s", str);
+//		printf("INSERT STRING :%s:\n", inserted_str);
+	} else
+		string_overwrite (cline->str, xpos, "%s", str);
+
+/*	string_debug (cline->str);*/
+
+	/* horizontal cursor movement */
+	pad->curs_x = get_curs_pos (xpos + strlen (str), cline) - pad->offset_x;
+
+	while (pad->curs_x > pad->width)
+	{
+		pad->offset_x += PADSTEP;
+		pad->curs_x   -= PADSTEP;
+	}
+
+	pad_modified (pad);	
 }
