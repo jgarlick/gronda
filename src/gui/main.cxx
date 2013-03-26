@@ -664,14 +664,18 @@ int main(int argc, char **argv) {
 	font_size = 14;
 #endif
 
-	/* use DM font if installed */
 	k = Fl::set_fonts("");
 	for (i = 0; i < k; i++) {
 		name = Fl::get_font_name((Fl_Font)i,&t);
 //		printf("%s\n", name);
-		if(!strcasecmp(name, "Apollo DM")) {
+		/* use DM font if installed */
+/*		if(!strcasecmp(name, "Apollo DM")) {
 			font = i;
 			font_size = 14;
+		}*/
+		if(!strcasecmp(name, "Source Code Pro")) {
+			font = i;
+			font_size = 12;
 		}
 	}
 
@@ -682,8 +686,8 @@ int main(int argc, char **argv) {
 	add_command ("icon",   (void (*)())cmd_icon);
 
 	// Aegis Blue
-	bg_color       = fl_rgb_color(255, 255, 230);
-	titlebar_color = fl_rgb_color(60, 60, 200);
+//	bg_color       = fl_rgb_color(255, 255, 230);
+//	titlebar_color = fl_rgb_color(60, 60, 200);
 	// Aegis Red
 //	bg_color       = fl_rgb_color(255, 240, 180);
 //	titlebar_color = fl_rgb_color(210, 20, 0);
@@ -697,10 +701,13 @@ int main(int argc, char **argv) {
 //	titlebar_color = fl_rgb_color(203, 9, 131); // pink
 //	titlebar_color = fl_rgb_color(9, 178, 148); // teal
 
+	bg_color       = fl_rgb_color(248, 245, 235);
+	titlebar_color = fl_rgb_color(60, 60, 200);
+
 //	line_color     = fl_rgb_color(150, 150, 150);
 	line_color = titlebar_color;
 
-	text_color          = fl_rgb_color(0, 0, 0);
+	text_color          = fl_rgb_color(30, 30, 30);
 	line_num_color      = fl_rgb_color(140, 140, 140);
 	line_num_line_color = fl_rgb_color(210, 210, 210);
 
