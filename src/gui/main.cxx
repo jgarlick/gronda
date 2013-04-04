@@ -480,7 +480,7 @@ int MyWindow::handle(int event) {
 		paste_buffer = buffer_find((char *)"clipboard");
 		if (paste_buffer) {
 			string_truncate (paste_buffer->str, 0);
-			string_append(paste_buffer->str, (char *)Fl::event_text());
+			string_append(paste_buffer->str, "%s", (char *)Fl::event_text());
 		}
 		return 1;
 	}
